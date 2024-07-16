@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     'corsheaders',
     #Local Apps
     'autenticacaoWeber',
+    'incomum',
 ]
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
