@@ -7,9 +7,9 @@ from .views.permissionsView import *
 from .views.groupView import *
 urlpatterns = [
     #Login
-    path('auth/token/login/', login_user, name='token_obtain_pair'),
-    path('auth/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
-    path('auth/token/register/', register_user, name='register_user'),
+    path('token/login/', login_user, name='token_obtain_pair'),
+    path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    path('token/register/', register_user, name='register_user'),
 
     #Permissioes
     path('permissions/', permission_list, name='permission_list'),
