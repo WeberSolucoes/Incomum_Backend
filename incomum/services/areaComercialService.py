@@ -43,9 +43,9 @@ def update(request, id) -> Response:
             area: AreaComercial = AreaComercial.objects.get(aco_codigo = id)
             loja: Loja = Loja.objects.get(loj_codigo = serializer.validated_data['id_loja'])
 
-            area.aco_descricao = serializer.validated_data['aco_descricao']
-            area.aco_rateio = serializer.validated_data['aco_rateio']
-            area.aco_situacao = serializer.validated_data['aco_situacao']
+            area.aco_descricao = serializer.validated_data['aco_descricao'] if serializer.validated_data['aco_descricao'] else area.aco_descricao
+            area.aco_rateio = serializer.validated_data['aco_rateio'] if serializer.validated_data['aco_rateio'] else area.aco_rateio
+            area.aco_situacao = serializer.validated_data['aco_situacao'] if serializer.validated_data['aco_situacao'] else area.aco_situacao
             area.loja_codigo = loja
             area.save()
 
