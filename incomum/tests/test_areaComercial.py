@@ -6,10 +6,7 @@ from rest_framework.test import APIRequestFactory
 from rest_framework import status
 from ..models import AreaComercial, Loja
 from ..services.areaComercialService import findById, create, findByLoja, update, delete, list_all
-from  rest_framework.response import Response
 from rest_framework.request import Request
-from django.core.handlers.wsgi import WSGIRequest
-import json
 from rest_framework.parsers import JSONParser
 
 class AreaComercialTestCase(TestCase):
