@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import areaComercialViews, lojaViews
+from .views import areaComercialViews, lojaViews, usuarioViews
 urlpatterns = [
 
     #AreaComercial
@@ -16,4 +16,11 @@ urlpatterns = [
     path('loja/update/<int:id>/', lojaViews.update),
     path('loja/delete/<int:id>/', lojaViews.delete),
     path('loja/list-all/', lojaViews.list_all),
+
+    #Usuario
+    path('user/find-byid/<int:id>/', usuarioViews.findById),
+    path('user/create/', usuarioViews.create),
+    path('user/update/<int:id>/', usuarioViews.update),
+    path('user/delete/<int:id>/', usuarioViews.delete),
+    path('user/list-all/', usuarioViews.list_all),
 ]
