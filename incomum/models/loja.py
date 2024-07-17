@@ -21,7 +21,7 @@ class Loja(models.Model):
     loj_emailbloqueio = models.EmailField(max_length=60, null=True, blank=True)
     loj_situacao = models.IntegerField(null=True, blank=True)
     loj_codigofinanceiro = models.IntegerField(null=True, blank=True)
-    aco_codigo = models.IntegerField(null=True, blank=True)
+    aco_codigo = models.ForeignKey('AreaComercial', on_delete=models.DO_NOTHING, db_column='aco_codigo', null=True, blank=True)
     loj_vendacorte = models.IntegerField(null=True, blank=True)
     loj_contrato = models.IntegerField(null=True, blank=True)
     loj_cortevendedor = models.IntegerField(null=True, blank=True)
