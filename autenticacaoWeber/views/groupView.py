@@ -7,7 +7,7 @@ from django.contrib.auth.models import Group
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
-from ..serializers.permissionSerializer import GroupSerializer
+from ..serializers.permissionSerializer import GroupSerializer, GroupResponseSerializer
 
 @swagger_auto_schema(
         method='get',
@@ -18,7 +18,7 @@ from ..serializers.permissionSerializer import GroupSerializer
 @permission_classes([IsAdminUser])
 def group_list(request):
     groups = Group.objects.all()
-    serializer = GroupSerializer(groups, many=True)
+    serializer = GroupResponseSerializer(groups, many=True)
     return Response(serializer.data)
 
 @swagger_auto_schema(
@@ -32,6 +32,8 @@ def group_list(request):
 def group_create(request):
     serializer = GroupSerializer(data=request.data)
     if serializer.is_valid():
+        if len(serializer.validated_data['permissions']) == 0:
+            return Response({"message":"O grupo precisa ter pelo menos uma permissão"} ,status=status.HTTP_400_BAD_REQUEST)
         serializer.save()
         return Response(serializer.data, status=status.HTTP_201_CREATED)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -49,7 +51,7 @@ def group_detail(request, pk):
     except Group.DoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND)
     
-    serializer = GroupSerializer(group)
+    serializer = GroupResponseSerializer(group)
     return Response(serializer.data)
 
 @swagger_auto_schema(

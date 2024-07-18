@@ -189,9 +189,9 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-# EMAIL_HOST = 'mail.webersolucoes.com.br'
-# EMAIL_PORT = 465
-# EMAIL_USE_SSL = True
-# EMAIL_HOST_USER = 'kauan@webersolucoes.com.br'  # Seu endereço de e-mail
-# EMAIL_HOST_PASSWORD = 'H-K3Vq#I_hRF'
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'mail.webersolucoes.com.br'
+EMAIL_PORT = 465
+EMAIL_USE_SSL = True
+EMAIL_HOST_USER = 'kauan@webersolucoes.com.br'  # Seu endereço de e-mail
+EMAIL_HOST_PASSWORD = 'H-K3Vq#I_hRF'
