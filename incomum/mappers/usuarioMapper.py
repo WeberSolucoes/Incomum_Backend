@@ -1,4 +1,5 @@
 from ..models.usuario import *
+from django.contrib.auth.models import Group
 from ..serializers.usuarioSerializer import *
 def DtoToEntity(dto: UsuarioDTOSerializer)-> Usuario:
     entity: Usuario = Usuario()
@@ -15,7 +16,7 @@ def DtoToEntityUpdate(dto: UsuarioDTOSerializer, entity: Usuario)-> Usuario:
 
     return entity
 
-def EntityToDto(entity):
+def EntityToDto(entity: Usuario):
     data = {
         'id': entity.id,
         'username': entity.username,
@@ -26,7 +27,9 @@ def EntityToDto(entity):
         'cpf': entity.usr_cpf,
         'data_nasc': entity.usr_datanascimento,
         'loja_id': entity.loj_codigo_id,
-        'dep_principal': entity.dep_codigo_id
+        'dep_principal': entity.dep_codigo_id,
+        'dep': UserGruposDTOSerializer(entity.groups.all(),many=True).data,
+        'funcoes': UserPermissionsDTOSerializer(entity.user_permissions.all(),many=True).data
     }
     dto = UsuarioDTOSerializer(data=data)
     dto.is_valid(raise_exception=True)
@@ -45,9 +48,48 @@ def EntitiesToDtos(entities):
         'cpf': entity.usr_cpf,
         'data_nasc': entity.usr_datanascimento,
         'loja_id': entity.loj_codigo_id,
-        'dep_principal': entity.dep_codigo_id
+        'dep_principal': entity.dep_codigo_id,
+        'dep': UserGruposDTOSerializer(entity.groups.all(),many=True).data,
+        'funcoes': UserPermissionsDTOSerializer(entity.user_permissions.all(),many=True).data
         }
         datas.append(data)
     dto = UsuarioDTOSerializer(data=datas, many=True)
+    dto.is_valid(raise_exception=True)
+    return dto
+
+def GrupoDtoToEntity(dto: UserGruposUpdateDTOSerializer)-> Group:
+    try:
+        entity: Group = Group.objects.get(id=dto.validated_data.get('id'))
+    except Group.DoesNotExist:
+        entity = None
+    return entity
+def GrupoEntityToDto(entity)-> UserGruposDTOSerializer:
+    data = {
+        'id': entity.id,
+        'name': entity.name
+    }
+    dto = UserGruposDTOSerializer(data=data)
+    dto.is_valid(raise_exception=True)
+    return dto
+def GruposEntitiesToDtos(entities):
+    datas = []
+    for entity in entities:
+        data = {
+        'id': entity.id,
+        'name': entity.name
+        }
+        datas.append(data)
+    dto = UserGruposDTOSerializer(data=datas, many=True)
+    dto.is_valid(raise_exception=True)
+    return dto
+def PermissoesEntitiesToDtos(entities):
+    datas = []
+    for entity in entities:
+        data = {
+        'id': entity.id,
+        'name': entity.name
+        }
+        datas.append(data)
+    dto = UserPermissionsDTOSerializer(data=datas, many=True)
     dto.is_valid(raise_exception=True)
     return dto
