@@ -2,6 +2,8 @@ from rest_framework.response import Response
 from rest_framework import status
 from ..models.usuario import Usuario as User 
 from ..serializers.usuarioSerializer import UsuarioDTOSerializer
+from ..mappers.usuarioMapper import *
+from django.db.utils import IntegrityError
 
 def findById(id) -> Response:
     try:
@@ -9,18 +11,24 @@ def findById(id) -> Response:
     except User.DoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND)
 
-    serializer = UsuarioDTOSerializer(user)
+    serializer = EntityToDto(user)
     return Response(serializer.data, status=status.HTTP_200_OK)
 
 def list_all() -> Response:
     users = User.objects.all()
-    serializer = UsuarioDTOSerializer(users, many=True)
+    serializer = EntitiesToDtos(users)
     return Response(serializer.data, status=status.HTTP_200_OK)
 
 def create(request) -> Response:
     serializer = UsuarioDTOSerializer(data=request.data)
     if serializer.is_valid():
-        serializer.save()
+        user: Usuario = DtoToEntity(serializer)
+        senha = user.first_name[0] + '@' + user.usr_cpf
+        user.set_password(senha)
+        try:
+            user.save()
+        except IntegrityError as e:
+            return Response(status=status.HTTP_409_CONFLICT)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -30,10 +38,11 @@ def update(request, id) -> Response:
     except User.DoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND)
 
-    serializer = UsuarioDTOSerializer(user, data=request.data)
+    serializer = UsuarioDTOSerializer(data=request.data)
     if serializer.is_valid():
-        serializer.save()
-        return Response(serializer.data)
+        DtoToEntityUpdate(serializer, user)
+        user.save()
+        return Response(serializer.data, status=status.HTTP_200_OK)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 def delete(id) -> Response:

@@ -33,6 +33,7 @@ class Usuario(AbstractUser):
     ven_codigo = models.IntegerField(null=True, blank=True)
     usr_cpf = models.CharField(max_length=20, null=True, blank=True)
     usr_datanascimento = models.DateTimeField(null=True, blank=True)
+    email = models.EmailField(('email address'), unique=True)
     
     # objects = CustomUserManager()
     REQUIRED_FIELDS = []
