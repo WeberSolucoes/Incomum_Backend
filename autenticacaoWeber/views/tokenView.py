@@ -1,9 +1,9 @@
 # views.py
 from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
-from ..serializers.tokenSerializer import loginSerializer, registerSerializer, UserSerializer
+from ..serializers.tokenSerializer import loginSerializer, registerSerializer, UserSerializer, UserIdSerializer
 from django.contrib.auth.models import User
 from drf_yasg.utils import swagger_auto_schema
 
@@ -43,3 +43,14 @@ def register_user(request):
         entity.save()
         return Response({'message': 'User created successfully'}, status=status.HTTP_201_CREATED)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+@swagger_auto_schema(
+    method='get',
+    responses={200: UserIdSerializer},
+)
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def user_id(request):
+    return Response(UserIdSerializer(request.user).data)
+

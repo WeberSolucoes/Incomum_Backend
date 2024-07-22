@@ -9,6 +9,7 @@ urlpatterns = [
     #Login
     path('token/login/', login_user, name='token_obtain_pair'),
     path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    path('token/user-id/', user_id, name='user_id'),
     # path('token/register/', register_user, name='register_user'),
 
     #Permissioes
