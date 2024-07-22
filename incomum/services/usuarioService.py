@@ -70,7 +70,7 @@ def update_password(request) -> Response:
             token = default_token_generator.make_token(user)
             uid = urlsafe_base64_encode(force_bytes(user.pk))
             reset_link = request.build_absolute_uri(
-                f'/updatePassword-confirm/{uid}/{token}/'
+                f'http://localhost:5173/redefinir-senha/{uid}/{token}/'
             )
             message = f"""
             <p>Ola {user.username},</p>

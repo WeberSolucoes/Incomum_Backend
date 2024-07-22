@@ -1,4 +1,6 @@
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view,permission_classes
+from rest_framework.permissions import AllowAny, IsAuthenticated
+
 
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
@@ -65,6 +67,7 @@ def delete(request, id):
     tags=['Usuario']
 )
 @api_view(['POST'])
+@permission_classes([AllowAny])
 def update_password(request):
     return usuarioService.update_password(request)
 
@@ -75,6 +78,7 @@ def update_password(request):
     tags=['Usuario']
 )
 @api_view(['POST'])
+@permission_classes([AllowAny])
 def update_password_confirm(request, uidb64, token):
     return usuarioService.update_password_confirm(request, uidb64, token)
 
