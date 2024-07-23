@@ -18,18 +18,17 @@ urlpatterns = [
     path('loja/list-all/', lojaViews.list_all),
 
     #Usuario
-    path('user/find-byid/<int:id>/', usuarioViews.findById),
-    path('user/create/', usuarioViews.create),
-    path('user/update/<int:id>/', usuarioViews.update),
-    path('user/delete/<int:id>/', usuarioViews.delete),
-    path('user/list-all/', usuarioViews.list_all),
-    path('user/updatePassword/', usuarioViews.update_password),
-    path('user/updatePassword-confirm/<uidb64>/<token>/', usuarioViews.update_password_confirm),
+    # path('user/find-byid/<int:id>/', usuarioViews.findById),
+    # path('user/create/', usuarioViews.create),
+    # path('user/update/<int:id>/', usuarioViews.update),
+    # path('user/delete/<int:id>/', usuarioViews.delete),
+    # path('user/list-all/', usuarioViews.list_all),
+    # path('user/updatePassword/', usuarioViews.update_password),
+    # path('user/updatePassword-confirm/<uidb64>/<token>/', usuarioViews.update_password_confirm),
     
     #UsuarioGroups
-    path('user/group/listGroups/<int:id>/', usuarioViews.list_groups),#NOVO
-    path('user/group/updateGroups/<int:id>/', usuarioViews.update_groups),#NOVO
-    path('user/permission/listPermissions/<int:id>/', usuarioViews.list_permissions),#NOVO
-    path('user/permission/updatePermissions/<int:id>/', usuarioViews.update_permissions),#NOVO
-    # path('user/haspermission/', usuarioViews.has_permission),
+    # path('user/group/listGroups/<int:id>/', usuarioViews.list_groups),
+    # path('user/group/updateGroups/<int:id>/', usuarioViews.update_groups),
+    # path('user/permission/listPermissions/<int:id>/', usuarioViews.list_permissions),
+    # path('user/permission/updatePermissions/<int:id>/', usuarioViews.update_permissions),
 ]

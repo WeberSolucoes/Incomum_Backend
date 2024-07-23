@@ -1,6 +1,7 @@
 from django.db import models
+
+from autenticacaoWeber.models.usuario import Usuario
 from .areaComercial import AreaComercial
-from .usuario import Usuario
 
 class UsuarioAreaComercial(models.Model):
     usuario = models.ForeignKey(Usuario, on_delete=models.CASCADE)
