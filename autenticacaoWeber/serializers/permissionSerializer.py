@@ -21,5 +21,20 @@ class GroupResponseSerializer(serializers.Serializer):
     name = serializers.CharField()
     permissions = PermissionResponseSerializer(many=True)
 
+class UserGruposDTOSerializer(serializers.Serializer):
+    id = serializers.IntegerField(required=False)
+    name = serializers.CharField(required=False)
+
+class UserGruposUpdateDTOSerializer(serializers.Serializer):
+    gruposId = serializers.ListField(child=serializers.IntegerField(),required=False)
+
+class UserPermissionsDTOSerializer(serializers.Serializer):
+    id = serializers.IntegerField(required=False)
+    name = serializers.CharField(required=False)
+
 class PermissionByGroupSerializer(serializers.Serializer):
     ids = serializers.ListField(child=serializers.IntegerField())
+
+class UserPermissionsUpdateDTOSerializer(serializers.Serializer):
+    permissionsId = serializers.ListField(child=serializers.IntegerField(),required=False)
+
