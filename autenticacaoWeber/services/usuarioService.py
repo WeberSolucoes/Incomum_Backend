@@ -79,7 +79,6 @@ def update_password(request) -> Response:
             <p>Por favor, acesse a seguinte página e escolha uma nova senha:</p>
             <p><a href="{reset_link}">{reset_link}</a></p>
             <p>Se você não solicitou esta alteração, ignore este email.</p>
-            <p>Seu nome de usuário, caso tenha esquecido: {user.username}</p>
             <p>Obrigado por utilizar nosso site!</p>
             """
             send_mail(
