@@ -128,7 +128,6 @@ def update_groups(request, id):
     serializer = UserGruposUpdateDTOSerializer(data=request.data)
     if serializer.is_valid():
         grupos = serializer.validated_data.get('gruposId')
-        print(grupos)
         user.groups.set(grupos)
         user.save()
 

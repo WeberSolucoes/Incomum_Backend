@@ -9,7 +9,6 @@ class UsuarioSerializer(serializers.ModelSerializer):
 
 class UsuarioDTOSerializer(serializers.Serializer):
     id = serializers.IntegerField(required=False)
-    username = serializers.CharField(required=False)
     email = serializers.EmailField(required=False)
     first_name = serializers.CharField(required=False, allow_blank=True)
     last_name = serializers.CharField(required=False, allow_blank=True)

@@ -6,7 +6,7 @@ def DtoToEntity(dto: UsuarioDTOSerializer)-> Usuario:
     entity: Usuario = Usuario()
     return DtoToEntityUpdate(dto, entity)
 def DtoToEntityUpdate(dto: UsuarioDTOSerializer, entity: Usuario)-> Usuario:
-    entity.username = dto.validated_data.get('username') if dto.validated_data.get('username') else entity.username
+    # entity.username = dto.validated_data.get('username') if dto.validated_data.get('username') else entity.username
     entity.email = dto.validated_data.get('email') if dto.validated_data.get('email') else entity.email
     entity.first_name = dto.validated_data.get('first_name') if dto.validated_data.get('first_name') else entity.first_name
     entity.last_name = dto.validated_data.get('last_name') if dto.validated_data.get('last_name') else entity.last_name
