@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import areaComercialViews, lojaViews, usuarioViews
+from .views import areaComercialViews, lojaViews
 urlpatterns = [
 
     #AreaComercial
