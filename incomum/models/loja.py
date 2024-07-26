@@ -12,7 +12,6 @@ class Loja(models.Model):
     loj_fone = models.CharField(max_length=20, null=True, blank=True)
     loj_fax = models.CharField(max_length=20, null=True, blank=True)
     loj_emailloja = models.EmailField(max_length=50, null=True, blank=True)
-    loj_homepage = models.URLField(max_length=50, null=True, blank=True)
     loj_emailfinanceiro = models.EmailField(max_length=60, null=True, blank=True)
     loj_textorelatorio = models.CharField(max_length=40, null=True, blank=True)
     loj_cnpj = models.CharField(max_length=20, null=True, blank=True)
