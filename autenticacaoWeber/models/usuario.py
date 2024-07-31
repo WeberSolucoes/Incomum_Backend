@@ -30,11 +30,17 @@ class CustomUserManager(BaseUserManager):
 class Usuario(AbstractUser):
     username = models.CharField(max_length=150, blank=True, default="")
     dep_codigo = models.ForeignKey(Group, on_delete=models.SET_NULL, null=True, blank=True)
-    loj_codigo = models.ForeignKey(Loja, on_delete=models.SET_NULL, null=True, blank=True)
-    ven_codigo = models.IntegerField(null=True, blank=True)
     usr_cpf = models.CharField(max_length=20, null=True, blank=True)
     usr_datanascimento = models.DateTimeField(null=True, blank=True)
     email = models.EmailField(('email address'), unique=True)
+    ven_endereco = models.CharField(max_length=60, null=True, blank=True)
+    ven_numero = models.CharField(max_length=15, null=True, blank=True)
+    ven_bairro = models.CharField(max_length=30, null=True, blank=True)
+    ven_cep = models.IntegerField(null=True, blank=True)
+    cid_codigo = models.IntegerField(null=True, blank=True)
+    ven_fone = models.CharField(max_length=17, null=True, blank=True)
+    ven_celular = models.CharField(max_length=17, null=True, blank=True)
+    ven_observacao = models.CharField(max_length=170, null=True, blank=True)
     
     objects = CustomUserManager()
     USERNAME_FIELD = 'email'
