@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import areaComercialViews, lojaViews
+from .views import areaComercialViews, lojaViews, relatorioViews
 urlpatterns = [
 
     #AreaComercial
@@ -16,4 +16,7 @@ urlpatterns = [
     path('loja/update/<int:id>/', lojaViews.update),
     path('loja/delete/<int:id>/', lojaViews.delete),
     path('loja/list-all/', lojaViews.list_all),
+
+    #Relatorios
+    path('relatorios/vendas-findby-filters/', relatorioViews.listByFilters),
 ]
