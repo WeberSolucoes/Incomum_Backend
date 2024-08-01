@@ -45,3 +45,15 @@ jobs:
           REMOTE_USER: ${{ secrets.REMOTE_USER }}
           REMOTE_PORT: ${{ secrets.REMOTE_PORT }}
           TARGET: ${{ secrets.REMOTE_TARGET_DEV }}
+      - name: Restart Django Application
+        run: |
+          ssh -i ${{ secrets.SERVER_SSH_KEY }} -p ${{ secrets.REMOTE_PORT }} ${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST }} << 'EOF'
+            source /public_html/dev/api/venv/bin/activate
+            cd public_html/dev/api/
+            python manage.py migrate
+            # Se você estiver usando gunicorn, reinicie-o. Caso contrário, ajuste o comando de acordo.
+            pkill gunicorn
+            nohup gunicorn config.wsgi:application --bind 0.0.0.0:8000 &
+          EOF
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SERVER_SSH_KEY }}
