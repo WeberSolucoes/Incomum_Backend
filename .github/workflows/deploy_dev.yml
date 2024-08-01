@@ -27,7 +27,7 @@ jobs:
           pip install -r requirements.txt
       - name: Write env file
         run: |
-          echo "${ENV_DEV}" > .env
+          echo "${{ secrets.ENV_DEV }}" > .env
       - name: Collect static files
         run: |
           source venv/bin/activate
