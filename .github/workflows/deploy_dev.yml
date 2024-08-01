@@ -18,7 +18,19 @@ jobs:
         uses: actions/setup-python@v2
         with:
           python-version: '3.11'  # ou a versão do Python que você está usando
-
+      - name: Install Nginx and Set Up
+        run: |
+          ssh -o StrictHostKeyChecking=no ${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST }} << 'EOF'
+            # Update package list and install Nginx
+            sudo apt-get update
+            sudo apt-get install -y nginx
+  
+            # Configure Nginx for your Django app
+            sudo cp /path/to/your/nginx/config /etc/nginx/sites-available/default
+  
+            # Restart Nginx to apply the new configuration
+            sudo systemctl restart nginx
+          EOF
       - name: Install dependencies
         run: |
           python -m venv venv
