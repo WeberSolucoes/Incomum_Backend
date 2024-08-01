@@ -20,7 +20,7 @@ jobs:
           python-version: '3.11'  # ou a versão do Python que você está usando
       - name: Install Nginx and Set Up
         run: |
-          ssh -o StrictHostKeyChecking=no ${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST }} << 'EOF'
+          ssh -p 65002 ${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST }}
             # Update package list and install Nginx
             sudo apt-get update
             sudo apt-get install -y nginx
@@ -30,7 +30,6 @@ jobs:
   
             # Restart Nginx to apply the new configuration
             sudo systemctl restart nginx
-          EOF
       - name: Install dependencies
         run: |
           python -m venv venv
