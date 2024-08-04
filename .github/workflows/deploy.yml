@@ -41,9 +41,7 @@ jobs:
               python3 -m venv venv
               source venv/bin/activate
               git checkout sprint
-              cat <<EOF > .env
-            ${{ secrets.ENV_DEV }}
-            EOF
+              
               git pull origin sprint
               pip install -r requirements.txt
               python3 manage.py migrate
@@ -54,9 +52,7 @@ jobs:
               python3 -m venv venv
               source venv/bin/activate
               git checkout qa
-              cat <<EOF > .env
-            ${{ secrets.ENV_STAGE }}
-            EOF
+              
               git pull origin qa
               pip install -r requirements.txt
               python3 manage.py migrate
@@ -66,9 +62,7 @@ jobs:
               python3 -m venv venv
               source venv/bin/activate
               git checkout main
-              cat <<EOF > .env
-            ${{ secrets.ENV_PROD }}
-            EOF
+              
               git pull origin main
               pip install -r requirements.txt
               python3 manage.py migrate
