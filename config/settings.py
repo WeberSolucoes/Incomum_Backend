@@ -12,7 +12,6 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 
 from pathlib import Path
 from decouple import config
-import os
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -200,4 +199,7 @@ EMAIL_HOST_USER = 'kauan@webersolucoes.com.br'  # Seu endereço de e-mail
 EMAIL_HOST_PASSWORD = 'H-K3Vq#I_hRF'
 
 STATIC_URL = '/api/static/'
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+STATIC_ROOT = '/var/www/dev/api/staticfiles/'
+STATICFILES_DIRS = [
+    [BASE_DIR/'static/']
+]
