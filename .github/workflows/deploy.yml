@@ -37,7 +37,16 @@ jobs:
           elif [ "${{ github.ref }}" == "refs/heads/main" ]; then
             echo "${{ secrets.ENV_PROD }}" > .env
           fi
-
+      - name: Set target directory
+        run: |
+          if [ "${{ github.ref }}" == "refs/heads/sprint" ]; then
+            echo "TARGET=${{ secrets.REMOTE_TARGET_DEV }}" >> $GITHUB_ENV
+          elif [ "${{ github.ref }}" == "refs/heads/qa" ]; then
+            echo "TARGET=${{ secrets.REMOTE_TARGET_STAGE }}" >> $GITHUB_ENV
+          elif [ "${{ github.ref }}" == "refs/heads/main" ]; then
+            echo "TARGET=${{ secrets.REMOTE_TARGET_PROD }}" >> $GITHUB_ENV
+          fi
+        
       - name: Deploy to VPS
         uses: easingthemes/ssh-deploy@main
         with:
@@ -48,15 +57,7 @@ jobs:
           REMOTE_HOST: ${{ secrets.REMOTE_HOST }}
           REMOTE_USER: ${{ secrets.REMOTE_USER }}
           REMOTE_PORT: ${{ secrets.REMOTE_PORT }}
-          TARGET: |
-            if [ "${{ github.ref }}" == "refs/heads/sprint" ]; then
-              echo ${{ secrets.REMOTE_TARGET_DEV }}
-            elif [ "${{ github.ref }}" == "refs/heads/qa" ]; then
-              echo ${{ secrets.REMOTE_TARGET_STAGE }}
-            elif [ "${{ github.ref }}" == "refs/heads/main" ]; then
-              echo ${{ secrets.REMOTE_TARGET_PROD }}
-            fi
-
+          TARGET: ${{ env.TARGET }}
       - name: Restart Django Application
         run: |
           if [ "${{ github.ref }}" == "refs/heads/sprint" ]; then
