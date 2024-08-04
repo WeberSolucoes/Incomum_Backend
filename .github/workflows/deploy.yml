@@ -17,7 +17,7 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Deploy para VPS
-        uses: appleboy/ssh-action@latest
+        uses: appleboy/ssh-action@v0.1.7
         with:
           host: ${{ secrets.REMOTE_HOST_IP }}
           username: ${{ secrets.REMOTE_USER }}
