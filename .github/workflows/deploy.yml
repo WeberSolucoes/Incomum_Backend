@@ -28,7 +28,7 @@ jobs:
       
       - name: SSH INTO SERVER AND DEPLOY
         run: |
-          sshpass -p "${{ secrets.SERVER_SSH_PASSPHRASE }}" ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST_IP }} -p ${{ secrets.REMOTE_PORT }}
+          sshpass -p "${{ secrets.SERVER_SSH_PASSPHRASE }}" ssh -o StrictHostKeyChecking=no ${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST_IP }} -p ${{ secrets.REMOTE_PORT }}
           if [ "${{ github.ref }}" == "refs/heads/sprint" ]; then
             cd ${{ secrets.REMOTE_TARGET_DEV }}
             source venv/bin/activate
