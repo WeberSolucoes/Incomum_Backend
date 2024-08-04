@@ -16,15 +16,18 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
       
+      - name: Install sshpass
+        run: sudo apt-get install sshpass
+      
       - name: SSH INTO SERVER AND DEPLOY
         run: |
-          ssh -o StrictHostKeyChecking=no -i ~/.ssh/github@hostinger ${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST_IP }} -p ${{ secrets.REMOTE_PORT }}
+          sshpass -p "${{ secrets.SERVER_SSH_PASSPHRASE }}" ssh -o StrictHostKeyChecking=no -i ~/.ssh/github@hostinger ${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST_IP }} -p ${{ secrets.REMOTE_PORT }}
           if [ "${{ github.ref }}" == "refs/heads/sprint" ]; then
             cd ${{ secrets.REMOTE_TARGET_DEV }}
             source venv/bin/activate
             git checkout sprint
             echo ${{ secrets.ENV_DEV }} > .env
-            git pull
+            git pull origin sprint
             pip install -r requirements.txt
             python manage.py migrate
             sudo systemctl restart viagemincomum-dev
@@ -33,7 +36,7 @@ jobs:
             source venv/bin/activate
             git checkout qa
             echo ${{ secrets.ENV_STAGE }} > .env
-            git pull
+            git pull origin qa
             pip install -r requirements.txt
             python manage.py migrate
             sudo systemctl restart viagemincomum-stage
@@ -42,7 +45,7 @@ jobs:
             source venv/bin/activate
             git checkout main
             echo ${{ secrets.ENV_PROD }} > .env
-            git pull
+            git pull origin main
             pip install -r requirements.txt
             python manage.py migrate
             sudo systemctl restart viagemincomum-prod
