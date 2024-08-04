@@ -28,6 +28,7 @@ jobs:
           script: |
             if [ "${{ github.ref }}" == "refs/heads/sprint" ]; then
               cd ${{ secrets.REMOTE_TARGET_DEV }}
+              python3 -m venv venv
               source venv/bin/activate
               git checkout sprint
               cat <<EOF > .env
@@ -39,6 +40,7 @@ jobs:
               sudo systemctl restart viagemincomum-dev
             elif [ "${{ github.ref }}" == "refs/heads/qa" ]; then
               cd ${{ secrets.REMOTE_TARGET_STAGE }}
+              python3 -m venv venv
               source venv/bin/activate
               git checkout qa
               cat <<EOF > .env
@@ -50,6 +52,7 @@ jobs:
               sudo systemctl restart viagemincomum-stage
             elif [ "${{ github.ref }}" == "refs/heads/main" ]; then
               cd ${{ secrets.REMOTE_TARGET_PROD }}
+              python3 -m venv venv
               source venv/bin/activate
               git checkout main
               cat <<EOF > .env
