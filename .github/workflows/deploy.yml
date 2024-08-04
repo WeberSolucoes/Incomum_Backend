@@ -19,9 +19,16 @@ jobs:
       - name: Install sshpass
         run: sudo apt-get install sshpass
       
+      - name: Setup SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H ${{ secrets.REMOTE_HOST_IP }} >> ~/.ssh/known_hosts
+      
       - name: SSH INTO SERVER AND DEPLOY
         run: |
-          sshpass -p "${{ secrets.SERVER_SSH_PASSPHRASE }}" ssh -o StrictHostKeyChecking=no -i ~/.ssh/github@hostinger ${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST_IP }} -p ${{ secrets.REMOTE_PORT }}
+          sshpass -p "${{ secrets.SERVER_SSH_PASSPHRASE }}" ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST_IP }} -p ${{ secrets.REMOTE_PORT }}
           if [ "${{ github.ref }}" == "refs/heads/sprint" ]; then
             cd ${{ secrets.REMOTE_TARGET_DEV }}
             source venv/bin/activate
