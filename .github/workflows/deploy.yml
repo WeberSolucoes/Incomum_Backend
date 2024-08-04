@@ -47,6 +47,8 @@ jobs:
             python manage.py migrate
             sudo systemctl restart viagemincomum-prod
           fi
+        env:
+          REMOTE_PASSWORD: ${{ secrets.SERVER_SSH_PASSPHRASE }}
 
           
 
