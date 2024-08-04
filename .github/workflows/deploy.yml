@@ -16,39 +16,78 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
 
-      - name: SSH INTO SERVER AND DEPLOY
-        run: |
-          ssh -o StrictHostKeyChecking=no ${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST_IP }} -p ${{ secrets.REMOTE_PORT }}
-          if [ "${{ github.ref }}" == "refs/heads/sprint" ]; then
-            cd ${{ secrets.REMOTE_TARGET_DEV }}
-            source venv/bin/activate
-            git checkout sprint
-            echo ${{ secrets.ENV_DEV }} > .env
-            git pull origin sprint
-            pip install -r requirements.txt
-            python manage.py migrate
-            sudo systemctl restart viagemincomum-dev
-          elif [ "${{ github.ref }}" == "refs/heads/qa" ]; then
-            cd ${{ secrets.REMOTE_TARGET_STAGE }}
-            source venv/bin/activate
-            git checkout qa
-            echo ${{ secrets.ENV_STAGE }} > .env
-            git pull origin qa
-            pip install -r requirements.txt
-            python manage.py migrate
-            sudo systemctl restart viagemincomum-stage
-          elif [ "${{ github.ref }}" == "refs/heads/main" ]; then
-            cd ${{ secrets.REMOTE_TARGET_PROD }}
-            source venv/bin/activate
-            git checkout main
-            echo ${{ secrets.ENV_PROD }} > .env
-            git pull origin main
-            pip install -r requirements.txt
-            python manage.py migrate
-            sudo systemctl restart viagemincomum-prod
-          fi
-        env:
-          REMOTE_PASSWORD: ${{ secrets.SERVER_SSH_PASSPHRASE }}
+      - name: Deploy para VPS
+        uses: appleboy/ssh-action@latest
+        with:
+          host: ${{ secrets.REMOTE_HOST_IP }}
+          username: ${{ secrets.REMOTE_USER }}
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          port: ${{ secrets.REMOTE_PORT }}
+          # source : "."
+          # target : ${{ secrets.REMOTE_TARGET_DEV }}
+          script: |
+            if [ "${{ github.ref }}" == "refs/heads/sprint" ]; then
+              cd ${{ secrets.REMOTE_TARGET_DEV }}
+              source venv/bin/activate
+              git checkout sprint
+              echo ${{ secrets.ENV_DEV }} > .env
+              git pull origin sprint
+              pip install -r requirements.txt
+              python manage.py migrate
+              sudo systemctl restart viagemincomum-dev
+            elif [ "${{ github.ref }}" == "refs/heads/qa" ]; then
+              cd ${{ secrets.REMOTE_TARGET_STAGE }}
+              source venv/bin/activate
+              git checkout qa
+              echo ${{ secrets.ENV_STAGE }} > .env
+              git pull origin qa
+              pip install -r requirements.txt
+              python manage.py migrate
+              sudo systemctl restart viagemincomum-stage
+            elif [ "${{ github.ref }}" == "refs/heads/main" ]; then
+              cd ${{ secrets.REMOTE_TARGET_PROD }}
+              source venv/bin/activate
+              git checkout main
+              echo ${{ secrets.ENV_PROD }} > .env
+              git pull origin main
+              pip install -r requirements.txt
+              python manage.py migrate
+              sudo systemctl restart viagemincomum-prod
+            fi
+
+      # - name: SSH INTO SERVER AND DEPLOY
+      #   run: |
+      #     ssh -o StrictHostKeyChecking=no ${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST_IP }} -p ${{ secrets.REMOTE_PORT }}
+      #     if [ "${{ github.ref }}" == "refs/heads/sprint" ]; then
+      #       cd ${{ secrets.REMOTE_TARGET_DEV }}
+      #       source venv/bin/activate
+      #       git checkout sprint
+      #       echo ${{ secrets.ENV_DEV }} > .env
+      #       git pull origin sprint
+      #       pip install -r requirements.txt
+      #       python manage.py migrate
+      #       sudo systemctl restart viagemincomum-dev
+      #     elif [ "${{ github.ref }}" == "refs/heads/qa" ]; then
+      #       cd ${{ secrets.REMOTE_TARGET_STAGE }}
+      #       source venv/bin/activate
+      #       git checkout qa
+      #       echo ${{ secrets.ENV_STAGE }} > .env
+      #       git pull origin qa
+      #       pip install -r requirements.txt
+      #       python manage.py migrate
+      #       sudo systemctl restart viagemincomum-stage
+      #     elif [ "${{ github.ref }}" == "refs/heads/main" ]; then
+      #       cd ${{ secrets.REMOTE_TARGET_PROD }}
+      #       source venv/bin/activate
+      #       git checkout main
+      #       echo ${{ secrets.ENV_PROD }} > .env
+      #       git pull origin main
+      #       pip install -r requirements.txt
+      #       python manage.py migrate
+      #       sudo systemctl restart viagemincomum-prod
+      #     fi
+      #   env:
+      #     REMOTE_PASSWORD: ${{ secrets.SERVER_SSH_PASSPHRASE }}
 
           
 
