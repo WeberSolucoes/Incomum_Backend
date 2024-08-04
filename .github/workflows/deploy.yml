@@ -28,11 +28,11 @@ jobs:
           REMOTE_PORT: ${{ secrets.REMOTE_PORT }}
           TARGET: |
             if [ "${{ github.ref }}" == "refs/heads/sprint" ]; then
-              ${{ secrets.REMOTE_TARGET_DEV }}
+              "${{ secrets.REMOTE_TARGET_DEV }}"
             elif [ "${{ github.ref }}" == "refs/heads/qa" ]; then
-              ${{ secrets.REMOTE_TARGET_STAGE }}
+              "${{ secrets.REMOTE_TARGET_STAGE }}"
             elif [ "${{ github.ref }}" == "refs/heads/main" ]; then
-              ${{ secrets.REMOTE_TARGET_PROD }}
+              "${{ secrets.REMOTE_TARGET_PROD }}"
             fi
       - name: Deploy para VPS
         uses: appleboy/ssh-action@v0.1.7
