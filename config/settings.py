@@ -200,6 +200,4 @@ EMAIL_HOST_PASSWORD = 'H-K3Vq#I_hRF'
 
 STATIC_URL = '/api/static/'
 STATIC_ROOT = '/var/www/dev/api/staticfiles/'
-STATICFILES_DIRS = [
-    [BASE_DIR/'static/']
-]
+STATICFILES_DIRS = [BASE_DIR/'static/',]
