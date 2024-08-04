@@ -61,9 +61,9 @@ jobs:
       - name: Restart Django Application
         run: |
           if [ "${{ github.ref }}" == "refs/heads/sprint" ]; then
-            ssh -o StrictHostKeyChecking=no -i ~/.ssh/github@hostinger ${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST }} "sudo systemctl restart viagemincomum-dev"
+            ssh -o StrictHostKeyChecking=no -i ~/.ssh/github@hostinger ${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST_SHORT }} "sudo systemctl restart viagemincomum-dev"
           elif [ "${{ github.ref }}" == "refs/heads/qa" ]; then
-            ssh -o StrictHostKeyChecking=no -i ~/.ssh/github@hostinger ${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST }} "sudo systemctl restart viagemincomum-stage"
+            ssh -o StrictHostKeyChecking=no -i ~/.ssh/github@hostinger ${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST_SHORT }} "sudo systemctl restart viagemincomum-stage"
           elif [ "${{ github.ref }}" == "refs/heads/main" ]; then
-            ssh -o StrictHostKeyChecking=no -i ~/.ssh/github@hostinger ${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST }} "sudo systemctl restart viagemincomum-prod"
+            ssh -o StrictHostKeyChecking=no -i ~/.ssh/github@hostinger ${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST_SHORT }} "sudo systemctl restart viagemincomum-prod"
           fi
