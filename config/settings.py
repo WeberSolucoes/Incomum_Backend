@@ -198,6 +198,6 @@ EMAIL_USE_SSL = True
 EMAIL_HOST_USER = 'kauan@webersolucoes.com.br'  # Seu endereço de e-mail
 EMAIL_HOST_PASSWORD = 'H-K3Vq#I_hRF'
 
-STATIC_URL = '/api/static/'
+STATIC_URL = '/static/'
 STATIC_ROOT = '/var/www/dev/api/staticfiles/'
 STATICFILES_DIRS = [BASE_DIR/'staticfiles/',]
