@@ -45,7 +45,6 @@ def EntitiesToDtos(entities):
         'email': entity.email,
         'first_name': entity.first_name,
         'last_name': entity.last_name,
-        'ven_cod': entity.ven_codigo,
         'cpf': entity.usr_cpf,
         'data_nasc': entity.usr_datanascimento,
         'loja_id': entity.loj_codigo_id,
