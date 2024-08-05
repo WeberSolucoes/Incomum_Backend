@@ -13,7 +13,7 @@ urlpatterns = [
     
     #user
     path('user/find-byid/<int:id>/', usuarioViews.findById),
-    path('user/creates/', usuarioViews.create),
+    path('user/create/', usuarioViews.create),
     path('user/update/<int:id>/', usuarioViews.update),
     path('user/delete/<int:id>/', usuarioViews.delete),
     path('user/list-all/', usuarioViews.list_all),
