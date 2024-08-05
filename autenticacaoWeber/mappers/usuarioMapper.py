@@ -47,7 +47,6 @@ def EntitiesToDtos(entities):
         'last_name': entity.last_name,
         'cpf': entity.usr_cpf,
         'data_nasc': entity.usr_datanascimento,
-        'loja_id': entity.loj_codigo_id,
         'dep_principal': entity.dep_codigo_id,
         'dep': UserGruposDTOSerializer(entity.groups.all(),many=True).data,
         'funcoes': UserPermissionsDTOSerializer(entity.user_permissions.all(),many=True).data
