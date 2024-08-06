@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 
 from pathlib import Path
 from decouple import config
+import os
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -56,6 +57,8 @@ REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': (
         'rest_framework.permissions.IsAuthenticated',
     ),
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 10  # Define o tamanho padrão da página
 }
 SWAGGER_SETTINGS = {
     'SECURITY_DEFINITIONS': {
@@ -189,3 +192,13 @@ EMAIL_PORT = 465
 EMAIL_USE_SSL = True
 EMAIL_HOST_USER = 'kauan@webersolucoes.com.br'  # Seu endereço de e-mail
 EMAIL_HOST_PASSWORD = 'H-K3Vq#I_hRF'
+
+STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static'),]
+
+# Também descomente o trecho
+#SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+#SECURE_SSL_REDIRECT = True
+#SESSION_COOKIE_SECURE = True
+#CSRF_COOKIE_SECURE = True

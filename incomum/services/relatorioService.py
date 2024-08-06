@@ -3,6 +3,9 @@ from django.db import connection
 from rest_framework.response import Response
 from rest_framework import status
 
+from autenticacaoWeber.models.usuario import *
+from incomum.serializers.vendedorSerializer import VendedorSerializer
+
 from ..models import *
 from ..serializers.relatorioSerializer import *
 
@@ -83,4 +86,29 @@ def filtraunidade(request):
         'areas_comerciais': areas_list
     })
 
+def filtra_vendedores(request):
+    user_id = request.user.id
+    
+    # Passo 1: Obtém as áreas comerciais associadas ao usuário
+    user_areas = UsuarioAreaComercial.objects.filter(usuario_id=user_id).values_list('area_comercial_id', flat=True)
+    areas_user = UsuarioAreaComercial.objects.filter(usuario_id=user_id).values_list('usuario_id', flat=True)
+    
+    # Passo 2: Obtém as lojas associadas às áreas comerciais
+    lojas = Loja.objects.filter(aco_codigo__in=user_areas).distinct()
+    
+    # Passo 3: Filtra os vendedores baseando-se nas lojas obtidas
+    vendedores = Vendedor.objects.filter(
+        usr_codigo= user_id
+    )
+    if vendedores is None:
+        vendedores = Vendedor.objects.filter(
+            usr_codigo__in=areas_user
+        )
+    
+    # Serializa os dados
+    vendedores_list = [{'ven_codigo': vendedor.ven_codigo, 'ven_descricaoweb1': vendedor.ven_descricaoweb1} for vendedor in vendedores]
+    print(vendedores_list)
 
+    return Response({
+        'vendedores': vendedores_list
+    })
