@@ -16,6 +16,3 @@ class AreaComercial(models.Model):
             models.UniqueConstraint(fields=['aco_codigo'], name='pk_areacomercial')
         ]
         verbose_name_plural = "Áreas Comerciais"
-    
-    def __str__(self):
-        return self.aco_descricao
