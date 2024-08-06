@@ -5,6 +5,7 @@ from rest_framework import status
 
 from autenticacaoWeber.models.usuario import *
 from incomum.serializers.vendedorSerializer import VendedorSerializer
+from incomum.serializers import agenciaSerializer
 
 from ..models import *
 from ..serializers.relatorioSerializer import *
@@ -112,3 +113,19 @@ def filtra_vendedores(request):
     return Response({
         'vendedores': vendedores_list
     })
+
+
+def filtra_agencia(request, id):
+    try:
+        # Filtra as agências com base no ID
+        consulta = Agencia.objects.filter(aco_codigo=id)
+        if consulta.exists():
+            # Serializa os dados
+            serializer = agenciaSerializer.AgenciaSerializer(consulta, many=True)
+            return Response({
+                'consulta': serializer.data  # Retorna os dados serializados
+            })
+        else:
+            return Response({'Obs': 'Nenhum Registro Encontrado'}, status=status.HTTP_404_NOT_FOUND)
+    except Agencia.DoesNotExist:
+        return Response({'Obs': 'Agencia não Encontrada'}, status=status.HTTP_404_NOT_FOUND)

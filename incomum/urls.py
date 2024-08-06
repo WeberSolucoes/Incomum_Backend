@@ -32,6 +32,7 @@ urlpatterns = [
     path('relatorio/delete/<int:id>/', relatorioViews.delete),
     path('relatorio/list-all/', relatorioViews.list_all),
     path('relatorio/unidade/', relatorioViews.filtraunidade),
-    path('relatorio/vendedor/', relatorioViews.filtravendedor)
+    path('relatorio/vendedor/', relatorioViews.filtravendedor),
+    path('relatorio/agencia/<int:id>/', relatorioViews.filtraagencia)
 
 ]

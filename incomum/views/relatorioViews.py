@@ -84,3 +84,12 @@ def filtraunidade(request):
 @api_view(['GET'])
 def filtravendedor(request):
     return relatorioService.filtra_vendedores(request)
+
+
+@swagger_auto_schema(
+        methods=['get'],
+        responses={200: relatorioSerializer(many=True)},
+        tags=['Relatorio'])
+@api_view(['GET'])
+def filtraagencia(request,id):
+    return relatorioService.filtra_agencia(request,id)
