@@ -1,5 +1,6 @@
 
 import datetime
+import locale
 from rest_framework.response import Response
 from rest_framework import status
 
@@ -10,21 +11,23 @@ from incomum.serializers import agenciaSerializer
 from ..models import *
 from ..serializers.relatorioSerializer import *
 
-def list_all_byfilter(request)->Response:
+locale.setlocale(locale.LC_ALL, 'pt_BR.UTF-8')
+
+def list_all_byfilter(request) -> Response:
     data_inicio = request.query_params.get('dataInicio')
     data_fim = request.query_params.get('dataFim')
 
-    if data_inicio == None or data_fim == None:
+    if data_inicio is None or data_fim is None:
         return Response({'message': 'Os parâmetros data inicial e data final são obrigatórios.'}, status=status.HTTP_400_BAD_REQUEST)
+
     try:
         data_inicio = datetime.datetime.strptime(data_inicio, '%d-%m-%Y')
         data_fim = datetime.datetime.strptime(data_fim, '%d-%m-%Y')
         if data_fim < data_inicio:
             return Response({'message': 'A data final deve ser maior que a data inicial.'}, status=status.HTTP_400_BAD_REQUEST)
-
     except ValueError:
-        return Response({'message': 'Data inválida. Use o formato YYYY-MM-DD.'}, status=status.HTTP_400_BAD_REQUEST)
-    
+        return Response({'message': 'Data inválida. Use o formato DD-MM-YYYY.'}, status=status.HTTP_400_BAD_REQUEST)
+
     unidades = request.query_params.getlist('unidade')
     areaComerciais = request.query_params.getlist('areaComercial')
     agencias = request.query_params.getlist('agencia')
@@ -33,20 +36,34 @@ def list_all_byfilter(request)->Response:
     relatorios = Relatorio.objects.filter(fim_data__range=[data_inicio, data_fim])
 
     if len(unidades) > 0:
-        relatorios = relatorios.filter(loj_codigo__in = unidades)
+        relatorios = relatorios.filter(loj_codigo__in=unidades)
 
-    if len(areaComerciais) > 0 :
-        relatorios = relatorios.filter(aco_codigo__in = areaComerciais)
+    if len(areaComerciais) > 0:
+        relatorios = relatorios.filter(aco_codigo__in=areaComerciais)
 
-    if len(agencias) > 0 :
-        relatorios = relatorios.filter(age_codigo__in = agencias)
+    if len(agencias) > 0:
+        relatorios = relatorios.filter(age_codigo__in=agencias)
 
-    if len(vendedores) > 0 :
-        relatorios = relatorios.filter(ven_codigo__in = vendedores)
+    if len(vendedores) > 0:
+        relatorios = relatorios.filter(ven_codigo__in=vendedores)
+
     relatorios = relatorios[:100]
-    serializer = RelatorioSerializer(relatorios, many=True)
 
-    return Response(serializer.data)
+    # Formatando os resultados
+    resultados_formatados = [{
+        'fim_tipo': relatorio.fim_tipo,
+        'tur_numerovenda': relatorio.tur_numerovenda,
+        'tur_codigo': relatorio.tur_codigo,
+        'fim_valorliquido': locale.currency(relatorio.fim_valorliquido, grouping=True, symbol=False),
+        'fim_data': relatorio.fim_data.strftime('%d/%m/%Y'),
+        'fim_markup': locale.currency(relatorio.fim_markup, grouping=True, symbol=False),
+        'fim_valorinc': locale.currency(relatorio.fim_valorinc, grouping=True, symbol=False),
+        'fim_valorincajustado': locale.currency(relatorio.fim_valorincajustado, grouping=True, symbol=False),
+        'aco_descricao': relatorio.aco_codigo.aco_descricao,
+        'age_descricao': relatorio.age_codigo.age_descricao
+    } for relatorio in relatorios]
+
+    return Response(resultados_formatados)
     
 def list_all_lojas_byfilter(id)->Response:
     areasId = AreaComercial.objects.filter(usuarioareacomercial__usuario_id = id)
