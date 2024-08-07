@@ -5,91 +5,54 @@ from rest_framework_simplejwt.authentication import JWTAuthentication
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
 
-from ..serializers.relatorioSerializer import *
+from incomum.serializers.lojaSerializer import LojaSerializer
+
+from ..serializers.relatorioSerializer import RelatorioSerializer
 from ..models import *
 from ..services import relatorioService
 
+
 @swagger_auto_schema(
-        methods=['get'], 
-        responses={200: relatorioSerializer},
+        methods=['get'],
         tags=['Relatorio'])
 @api_view(['GET'])
 @authentication_classes([JWTAuthentication])
 @permission_classes([IsAuthenticated])
-def find_by_id(request, id):
-    return relatorioService.findById(id)
-
-@swagger_auto_schema(
-        methods=['post'],
-        request_body=relatorioSerializer,
-        responses={201: relatorioSerializer},
-        tags=['Relatorio'])
-@api_view(['POST'])
-@authentication_classes([JWTAuthentication])
-@permission_classes([IsAuthenticated])
-def create(request):
-    return relatorioService.create(request)
+def list_all_byfilter(request):
+    return relatorioService.list_all_byfilter(request)
 
 @swagger_auto_schema(
         methods=['get'],
-        responses={200: relatorioSerializer(many=True)},
         tags=['Relatorio'])
 @api_view(['GET'])
 @authentication_classes([JWTAuthentication])
 @permission_classes([IsAuthenticated])
-def find_by_loja(request, id):
-    return relatorioService.findByLoja(id)
+def list_all_lojas_byfilter(request,id):
+    return relatorioService.list_all_lojas_byfilter(id)
 
 @swagger_auto_schema(
-        methods=['put'],
-        request_body=relatorioSerializer,
-        responses={200: relatorioSerializer},
+        methods=['get'],
         tags=['Relatorio'])
-@api_view(['PUT'])
+@api_view(['GET'])
 @authentication_classes([JWTAuthentication])
 @permission_classes([IsAuthenticated])
-def update(request, id):
-    return relatorioService.update(request, id)
+def list_all_areas_byfilter(request,id):
+    return relatorioService.list_all_areas_byfilter(request, id)
 
 @swagger_auto_schema(
-        methods=['delete'],
-        responses={204: openapi.Response(description="No Content")},
+        methods=['get'],
         tags=['Relatorio'])
-@api_view(['DELETE'])
+@api_view(['GET'])
 @authentication_classes([JWTAuthentication])
 @permission_classes([IsAuthenticated])
-def delete(request, id):
-    return relatorioService.delete(id)
+def list_all_vendedores_byfilter(request,id):
+    return relatorioService.list_all_vendedores_byfilter(request, id)
 
 @swagger_auto_schema(
         methods=['get'],
-        responses={200: relatorioSerializer(many=True)},
         tags=['Relatorio'])
 @api_view(['GET'])
-def list_all(request):
-    return relatorioService.list_all(request)
-
-@swagger_auto_schema(
-        methods=['get'],
-        responses={200: relatorioSerializer(many=True)},
-        tags=['Relatorio'])
-@api_view(['GET'])
-def filtraunidade(request):
-    return relatorioService.filtraunidade(request)
-
-@swagger_auto_schema(
-        methods=['get'],
-        responses={200: relatorioSerializer(many=True)},
-        tags=['Relatorio'])
-@api_view(['GET'])
-def filtravendedor(request):
-    return relatorioService.filtra_vendedores(request)
-
-
-@swagger_auto_schema(
-        methods=['get'],
-        responses={200: relatorioSerializer(many=True)},
-        tags=['Relatorio'])
-@api_view(['GET'])
-def filtraagencia(request,id):
-    return relatorioService.filtra_agencia(request,id)
+@authentication_classes([JWTAuthentication])
+@permission_classes([IsAuthenticated])
+def list_all_agencias_byfilter(request,id):
+    return relatorioService.list_all_agencias_byfilter(request, id)

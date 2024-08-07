@@ -1,13 +1,13 @@
 from rest_framework import serializers
 
-from ..models.relatorio import FaturamentoSimplificado
+from ..models.relatorio import Relatorio
 
-class relatorioSerializer(serializers.ModelSerializer):
+class RelatorioSerializer(serializers.ModelSerializer):
     nome_loja = serializers.SerializerMethodField()
     aco_descricao = serializers.SerializerMethodField()
 
     class Meta:
-        model = FaturamentoSimplificado
+        model = Relatorio
         fields = [
             'fim_codigo',
             'tur_codigo',

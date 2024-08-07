@@ -20,19 +20,17 @@ urlpatterns = [
     path('loja/list-all/', lojaViews.list_all),
 
     #UsuarioComercial
-    path('Usuario_Comercial/find-byid/<int:id>/', usuarioComercialViews.find_by_id),
-    path('Usuario_Comercial/create/', usuarioComercialViews.create),
-    path('Usuario_Comercial/update/<int:id>/', usuarioComercialViews.update),
-    path('Usuario_Comercial/delete/<int:id>/', usuarioComercialViews.delete),
-    path('Usuario_Comercial/list-all/<int:id>/', usuarioComercialViews.list_all),
+    path('usuario_comercial/find-byid/<int:id>/', usuarioComercialViews.find_by_id),
+    path('usuario_comercial/create/', usuarioComercialViews.create),
+    path('usuario_comercial/update/<int:id>/', usuarioComercialViews.update),
+    path('usuario_comercial/delete/<int:id>/', usuarioComercialViews.delete),
+    path('usuario_comercial/list-all/<int:id>/', usuarioComercialViews.list_all),
 
-    path('relatorio/find-byid/<int:id>/', relatorioViews.find_by_id),
-    path('relatorio/create/', relatorioViews.create),
-    path('relatorio/update/<int:id>/', relatorioViews.update),
-    path('relatorio/delete/<int:id>/', relatorioViews.delete),
-    path('relatorio/list-all/', relatorioViews.list_all),
-    path('relatorio/unidade/', relatorioViews.filtraunidade),
-    path('relatorio/vendedor/', relatorioViews.filtravendedor),
-    path('relatorio/agencia/<int:id>/', relatorioViews.filtraagencia)
+    #Relatorio
+    path('relatorio/list-all-by-filter/', relatorioViews.list_all_byfilter),
+    path('relatorio/loja-by-user/<int:id>/', relatorioViews.list_all_lojas_byfilter),
+    path('relatorio/area-by-user/<int:id>/', relatorioViews.list_all_areas_byfilter),
+    path('relatorio/vendedor-by-user/<int:id>/', relatorioViews.list_all_vendedores_byfilter),
+    path('relatorio/agencia-by-user/<int:id>/', relatorioViews.list_all_agencias_byfilter),
 
 ]

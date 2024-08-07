@@ -5,7 +5,7 @@ from incomum.models.areaComercial import AreaComercial
 from incomum.models.loja import Loja
 from incomum.models.vendedor import Vendedor
 
-class FaturamentoSimplificado(models.Model):
+class Relatorio(models.Model):
     fim_codigo = models.AutoField(primary_key=True)  # Assuming this field is auto-incrementing
     tur_codigo = models.IntegerField()
     loj_codigo = models.ForeignKey(Loja, on_delete=models.DO_NOTHING, db_column='loj_codigo', null=True, blank=True)

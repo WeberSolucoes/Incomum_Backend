@@ -1,5 +1,5 @@
 
-from django.db import connection
+import datetime
 from rest_framework.response import Response
 from rest_framework import status
 
@@ -10,122 +10,91 @@ from incomum.serializers import agenciaSerializer
 from ..models import *
 from ..serializers.relatorioSerializer import *
 
-def findById(id) -> Response:
-    try:
-        relatorio: FaturamentoSimplificado = FaturamentoSimplificado.objects.get(loj_codigo = id)
-    except FaturamentoSimplificado.DoesNotExist:
-        return Response(status=status.HTTP_404_NOT_FOUND)
+def list_all_byfilter(request)->Response:
+    data_inicio = request.query_params.get('dataInicio')
+    data_fim = request.query_params.get('dataFim')
 
-    serializer = relatorioSerializer(relatorio)
+    if data_inicio == None or data_fim == None:
+        return Response({'message': 'Os parâmetros data inicial e data final são obrigatórios.'}, status=status.HTTP_400_BAD_REQUEST)
+    try:
+        data_inicio = datetime.datetime.strptime(data_inicio, '%d-%m-%Y')
+        data_fim = datetime.datetime.strptime(data_fim, '%d-%m-%Y')
+        if data_fim < data_inicio:
+            return Response({'message': 'A data final deve ser maior que a data inicial.'}, status=status.HTTP_400_BAD_REQUEST)
+
+    except ValueError:
+        return Response({'message': 'Data inválida. Use o formato YYYY-MM-DD.'}, status=status.HTTP_400_BAD_REQUEST)
+    
+    unidades = request.query_params.getlist('unidade')
+    areaComerciais = request.query_params.getlist('areaComercial')
+    agencias = request.query_params.getlist('agencia')
+    vendedores = request.query_params.getlist('vendedor')
+
+    relatorios = Relatorio.objects.filter(fim_data__range=[data_inicio, data_fim])
+
+    if len(unidades) > 0:
+        relatorios = relatorios.filter(loj_codigo__in = unidades)
+
+    if len(areaComerciais) > 0 :
+        relatorios = relatorios.filter(aco_codigo__in = areaComerciais)
+
+    if len(agencias) > 0 :
+        relatorios = relatorios.filter(age_codigo__in = agencias)
+
+    if len(vendedores) > 0 :
+        relatorios = relatorios.filter(ven_codigo__in = vendedores)
+    relatorios = relatorios[:100]
+    serializer = RelatorioSerializer(relatorios, many=True)
+
     return Response(serializer.data)
+    
+def list_all_lojas_byfilter(id)->Response:
+    areasId = AreaComercial.objects.filter(usuarioareacomercial__usuario_id = id)
+    lojas_id = set(areasId.values_list('loja_codigo',flat=True))
+    lojas = Loja.objects.filter(loj_codigo__in = lojas_id).values('loj_codigo', 'loj_descricao')
 
-def create(request) -> Response:
-    serializer = relatorioSerializer(data=request.data)
-    if serializer.is_valid():
-        serializer.save()
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
-    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    return Response(lojas)
 
-def update(request, id) -> Response:
-    try:
-        loja: FaturamentoSimplificado = FaturamentoSimplificado.objects.get(loj_codigo = id)
-    except FaturamentoSimplificado.DoesNotExist:
-        return Response(status=status.HTTP_404_NOT_FOUND)
+def list_all_areas_byfilter(request ,id)->Response:
+    areas = AreaComercial.objects.filter(usuarioareacomercial__usuario_id = id).values('aco_codigo', 'aco_descricao')
+    unidades = request.query_params.getlist('unidade')
 
-    serializer = relatorioSerializer(loja, data=request.data)
-    if serializer.is_valid():
-        serializer.save()
-        return Response(serializer.data)
-    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    if len(unidades) > 0:
+        areas = areas.filter(loja_codigo__in = unidades)
 
-def delete(id) -> Response:
-    try:
-        loja: FaturamentoSimplificado = FaturamentoSimplificado.objects.get(loj_codigo = id)
-    except FaturamentoSimplificado.DoesNotExist:
-        return Response(status=status.HTTP_404_NOT_FOUND)
+    return Response(areas)
 
-    loja.delete()
-    return Response(status=status.HTTP_204_NO_CONTENT)
-
-def list_all(request):
-
-    # Obtém os parâmetros da consulta
-    date_start = request.query_params.get('dateStart')
-    date_end = request.query_params.get('dateEnd')
-
-
-    # Adiciona a filtragem por data e aco_codigo
-    if date_start and date_end:
-        try:
-            data = FaturamentoSimplificado.objects.filter(
-                fim_data__range=[date_start, date_end]
-            ).select_related('loj_codigo', 'aco_codigo')
-        except ValueError:
-            return Response({"detail": "Invalid date format"}, status=status.HTTP_400_BAD_REQUEST)
+def list_all_vendedores_byfilter(request ,id)->Response:
+    user = Usuario.objects.get(id = id)
+    if (user.groups.filter(name = 'Vendedor').exists()):
+        data = {
+            "id": user.id,
+            "first_name": user.first_name,
+            "last_name": user.last_name
+        }
+        return Response(data=data)
     else:
-        data = FaturamentoSimplificado.objects.filter(
-        ).select_related('loj_codigo', 'aco_codigo')
+        unidades = request.query_params.getlist('unidade')
+        print(unidades)
+        if len(unidades) == 0:
+            return Response({'message': 'O parâmetro unidade é obrigatório.'}, status=status.HTTP_400_BAD_REQUEST)
+        #procuro as areas comercias filtrando pela unidade
+        #acho os usuarios pela area comercial
+        #verifico quais usuario sao vendedores e voalá
+        areas = AreaComercial.objects.filter(loja_codigo__in = unidades)
+        usuarios = UsuarioAreaComercial.objects.filter(area_comercial__in = areas)
+        usuarios = Usuario.objects.filter(id__in = usuarios.values_list('usuario_id', flat=True))
+        vendedores = usuarios.filter(groups__name = 'Vendedor').values('id', 'first_name', 'last_name')
 
-    serializer = relatorioSerializer(data, many=True)
-    # Retorna também as áreas comerciais
-    return Response({
-        'data': serializer.data
-    })
+        return Response(vendedores)
 
-def filtraunidade(request):
-    # Obtém o ID do usuário
-    user_id = request.user.id
-    
-    # Consulta os aco_codigo associados ao usuário
-    user_aco_codes = UsuarioAreaComercial.objects.filter(usuario_id=user_id).values_list('area_comercial_id', flat=True)
-    
-    # Filtra as áreas comerciais com base nos códigos obtidos
-    areas = AreaComercial.objects.filter(aco_codigo__in=user_aco_codes)
-    areas_list = [{'aco_codigo': area.aco_codigo, 'aco_descricao': area.aco_descricao} for area in areas]
-    
-    return Response({
-        'areas_comerciais': areas_list
-    })
+def list_all_agencias_byfilter(request ,id)->Response:
+    areas = AreaComercial.objects.filter(usuarioareacomercial__usuario_id = id).values_list('aco_codigo', flat=True)
+    agencias = Agencia.objects.filter(aco_codigo__in = areas).values('age_codigo', 'age_descricao')
 
-def filtra_vendedores(request):
-    user_id = request.user.id
-    
-    # Passo 1: Obtém as áreas comerciais associadas ao usuário
-    user_areas = UsuarioAreaComercial.objects.filter(usuario_id=user_id).values_list('area_comercial_id', flat=True)
-    areas_user = UsuarioAreaComercial.objects.filter(usuario_id=user_id).values_list('usuario_id', flat=True)
-    
-    # Passo 2: Obtém as lojas associadas às áreas comerciais
-    lojas = Loja.objects.filter(aco_codigo__in=user_areas).distinct()
-    
-    # Passo 3: Filtra os vendedores baseando-se nas lojas obtidas
-    vendedores = Vendedor.objects.filter(
-        usr_codigo= user_id
-    )
-    if vendedores is None:
-        vendedores = Vendedor.objects.filter(
-            usr_codigo__in=areas_user
-        )
-    
-    # Serializa os dados
-    vendedores_list = [{'ven_codigo': vendedor.ven_codigo, 'ven_descricaoweb1': vendedor.ven_descricaoweb1} for vendedor in vendedores]
-    print(vendedores_list)
+    areasComerciais = request.query_params.getlist('areaComercial')
 
-    return Response({
-        'vendedores': vendedores_list
-    })
+    if len(areasComerciais) > 0:
+        agencias = agencias.filter(aco_codigo__in = areasComerciais)
 
-
-def filtra_agencia(request, id):
-    try:
-        # Filtra as agências com base no ID
-        consulta = Agencia.objects.filter(aco_codigo=id)
-        if consulta.exists():
-            # Serializa os dados
-            serializer = agenciaSerializer.AgenciaSerializer(consulta, many=True)
-            return Response({
-                'consulta': serializer.data  # Retorna os dados serializados
-            })
-        else:
-            return Response({'Obs': 'Nenhum Registro Encontrado'}, status=status.HTTP_404_NOT_FOUND)
-    except Agencia.DoesNotExist:
-        return Response({'Obs': 'Agencia não Encontrada'}, status=status.HTTP_404_NOT_FOUND)
+    return Response(agencias)
