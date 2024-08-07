@@ -1,22 +1,30 @@
 from rest_framework import serializers
 
-class RelatorioFiltersSerializer (serializers.Serializer):
-    dataInicio = serializers.DateField(required=True)
-    dataFim = serializers.DateField(required=True)
-    loja = serializers.IntegerField(required=False)
-    areaComercial = serializers.IntegerField(required=False)
-    agencia = serializers.IntegerField(required=False)
-    vendedor = serializers.IntegerField(required=False)
+from ..models.relatorio import Relatorio
 
-class RelatorioSimplificadoResponse (serializers.Serializer):
-    id = serializers.IntegerField(required=True)
-    tipo = serializers.CharField(required=True)
-    numeroVenda = serializers.CharField(required=True)
-    numeroPacote = serializers.IntegerField(required=False)
-    dataVenda = serializers.CharField(required=True)
-    valorLiquidoVenda = serializers.FloatField(required=True)
-    markUp = serializers.FloatField(required=True)
-    valorInc = serializers.FloatField(required=True)
-    valorIncAjustado = serializers.FloatField(required=True)
-    areaComercial = serializers.CharField(required=True)
-    agencia = serializers.CharField(required=True)
+class RelatorioSerializer(serializers.ModelSerializer):
+    nome_loja = serializers.SerializerMethodField()
+    aco_descricao = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Relatorio
+        fields = [
+            'fim_codigo',
+            'tur_codigo',
+            'loj_codigo',
+            'fim_data',
+            'aco_codigo',
+            'fim_tipo',
+            'tur_numerovenda',
+            'fim_valorliquido',
+            'fim_markup',
+            'fim_valorinc',
+            'fim_valorincajustado',
+            'nome_loja',
+            'aco_descricao'
+        ]
+
+    def get_nome_loja(self, obj):
+        return obj.loj_codigo.loj_descricao if obj.loj_codigo else None
+    def get_aco_descricao(self, obj):
+        return obj.aco_codigo.aco_descricao if obj.aco_codigo else None

@@ -26,10 +26,6 @@ class Migration(migrations.Migration):
                 ('fim_markup', models.FloatField()),
                 ('fim_valorinc', models.FloatField()),
                 ('fim_valorincajustado', models.FloatField()),
-                ('loj_descricao', models.CharField(max_length=10)),
-                ('aco_descricao', models.CharField(max_length=20)),
-                ('ven_descricao', models.CharField(max_length=40)),
-                ('age_descricao', models.CharField(max_length=40)),
             ],
             options={
                 'verbose_name': 'Faturamento Simplificado',

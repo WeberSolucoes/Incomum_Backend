@@ -1,5 +1,7 @@
+from django import views
 from django.urls import path
-from .views import areaComercialViews, lojaViews, relatorioViews
+
+from .views import areaComercialViews, lojaViews, usuarioComercialViews, relatorioViews, relatorioViews
 urlpatterns = [
 
     #AreaComercial
@@ -17,6 +19,18 @@ urlpatterns = [
     path('loja/delete/<int:id>/', lojaViews.delete),
     path('loja/list-all/', lojaViews.list_all),
 
-    #Relatorios
-    path('relatorios/vendas-findby-filters/', relatorioViews.listByFilters),
+    #UsuarioComercial
+    path('usuario_comercial/find-byid/<int:id>/', usuarioComercialViews.find_by_id),
+    path('usuario_comercial/create/', usuarioComercialViews.create),
+    path('usuario_comercial/update/<int:id>/', usuarioComercialViews.update),
+    path('usuario_comercial/delete/<int:id>/', usuarioComercialViews.delete),
+    path('usuario_comercial/list-all/<int:id>/', usuarioComercialViews.list_all),
+
+    #Relatorio
+    path('relatorio/list-all-by-filter/', relatorioViews.list_all_byfilter),
+    path('relatorio/loja-by-user/<int:id>/', relatorioViews.list_all_lojas_byfilter),
+    path('relatorio/area-by-user/<int:id>/', relatorioViews.list_all_areas_byfilter),
+    path('relatorio/vendedor-by-user/<int:id>/', relatorioViews.list_all_vendedores_byfilter),
+    path('relatorio/agencia-by-user/<int:id>/', relatorioViews.list_all_agencias_byfilter),
+
 ]
