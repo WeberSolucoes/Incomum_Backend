@@ -14,7 +14,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
         with:
-          token: ${{ secrets.GH_TOKEN }}
+          token: ${{ secrets.SERVER_SSH_KEY }}
       - name: Copy Files to VPS
         uses: easingthemes/ssh-deploy@main
         with:
