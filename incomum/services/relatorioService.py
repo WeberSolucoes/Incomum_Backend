@@ -48,26 +48,6 @@ def list_all_byfilter(request) -> Response:
     if len(vendedores) > 0:
         relatorios = relatorios.filter(ven_codigo__in=vendedores)
 
-    # Formatando os resultados
-    # resultados_formatados = [{
-    #     'fim_tipo': relatorio.fim_tipo,
-    #     'tur_numerovenda': relatorio.tur_numerovenda,
-    #     'tur_codigo': relatorio.tur_codigo,
-    #     'fim_valorliquido': locale.currency(relatorio.fim_valorliquido, grouping=True, symbol=False),
-    #     'fim_data': relatorio.fim_data.strftime('%d/%m/%Y'),
-    #     'fim_markup': locale.currency(relatorio.fim_markup, grouping=True, symbol=False),
-    #     'fim_valorinc': locale.currency(relatorio.fim_valorinc, grouping=True, symbol=False),
-    #     'fim_valorincajustado': locale.currency(relatorio.fim_valorincajustado, grouping=True, symbol=False),
-    #     'aco_descricao': relatorio.aco_codigo.aco_descricao,
-    #     'age_descricao': relatorio.age_codigo.age_descricao
-    # } for relatorio in relatorios]
-    # for relatorio in relatorios:
-    #     relatorio.fim_valorliquido = locale.currency(relatorio.fim_valorliquido, grouping=True, symbol=False)
-    #     relatorio.fim_markup = locale.currency(relatorio.fim_markup, grouping=True, symbol=False)
-    #     relatorio.fim_valorinc = locale.currency(relatorio.fim_valorinc, grouping=True, symbol=False)
-    #     relatorio.fim_valorincajustado = locale.currency(relatorio.fim_valorincajustado, grouping=True, symbol=False)
-    #     relatorio.fim_data = relatorio.fim_data.strftime('%d/%m/%Y')
-
     relatorios = paginator.paginate_queryset(relatorios, request)
     serializer = RelatorioSerializer(relatorios, many=True)
     return paginator.get_paginated_response(serializer.data)

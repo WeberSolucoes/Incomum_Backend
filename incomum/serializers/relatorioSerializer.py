@@ -31,7 +31,7 @@ class RelatorioSerializer(serializers.ModelSerializer):
         ]
 
     def get_nome_loja(self, obj):
-        return obj.loj_codigo.loj_descricao if obj.loj_codigo else None
+        return obj.age_codigo.age_descricao if obj.loj_codigo else None
 
     def get_aco_descricao(self, obj):
         return obj.aco_codigo.aco_descricao if obj.aco_codigo else None
