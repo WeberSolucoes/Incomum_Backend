@@ -27,6 +27,15 @@ def list_all_byfilter(request):
 @api_view(['GET'])
 @authentication_classes([JWTAuthentication])
 @permission_classes([IsAuthenticated])
+def total_byfilter(request):
+    return relatorioService.total_byfilter(request)
+
+@swagger_auto_schema(
+        methods=['get'],
+        tags=['Relatorio'])
+@api_view(['GET'])
+@authentication_classes([JWTAuthentication])
+@permission_classes([IsAuthenticated])
 def list_all_lojas_byfilter(request,id):
     return relatorioService.list_all_lojas_byfilter(id)
 
