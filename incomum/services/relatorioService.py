@@ -1,22 +1,21 @@
 
 import datetime
-import locale
 from rest_framework.response import Response
 from rest_framework import status
 
 from autenticacaoWeber.models.usuario import *
 from incomum.serializers.vendedorSerializer import VendedorSerializer
 from incomum.serializers import agenciaSerializer
+from rest_framework.pagination import PageNumberPagination
 
 from ..models import *
 from ..serializers.relatorioSerializer import *
 
-locale.setlocale(locale.LC_ALL, 'pt_BR.UTF-8')
-
 def list_all_byfilter(request) -> Response:
     data_inicio = request.query_params.get('dataInicio')
     data_fim = request.query_params.get('dataFim')
-
+    # data_inicio = "01-08-2024"
+    # data_fim = "03-08-2024"
     if data_inicio is None or data_fim is None:
         return Response({'message': 'Os parâmetros data inicial e data final são obrigatórios.'}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -33,8 +32,10 @@ def list_all_byfilter(request) -> Response:
     agencias = request.query_params.getlist('agencia')
     vendedores = request.query_params.getlist('vendedor')
 
-    relatorios = Relatorio.objects.filter(fim_data__range=[data_inicio, data_fim])
+    paginator = PageNumberPagination()
+    paginator.page_size = request.query_params.get('pageSize',10)
 
+    relatorios = Relatorio.objects.filter(fim_data__range=[data_inicio, data_fim])
     if len(unidades) > 0:
         relatorios = relatorios.filter(loj_codigo__in=unidades)
 
@@ -47,23 +48,9 @@ def list_all_byfilter(request) -> Response:
     if len(vendedores) > 0:
         relatorios = relatorios.filter(ven_codigo__in=vendedores)
 
-    relatorios = relatorios[:100]
-
-    # Formatando os resultados
-    resultados_formatados = [{
-        'fim_tipo': relatorio.fim_tipo,
-        'tur_numerovenda': relatorio.tur_numerovenda,
-        'tur_codigo': relatorio.tur_codigo,
-        'fim_valorliquido': locale.currency(relatorio.fim_valorliquido, grouping=True, symbol=False),
-        'fim_data': relatorio.fim_data.strftime('%d/%m/%Y'),
-        'fim_markup': locale.currency(relatorio.fim_markup, grouping=True, symbol=False),
-        'fim_valorinc': locale.currency(relatorio.fim_valorinc, grouping=True, symbol=False),
-        'fim_valorincajustado': locale.currency(relatorio.fim_valorincajustado, grouping=True, symbol=False),
-        'aco_descricao': relatorio.aco_codigo.aco_descricao,
-        'age_descricao': relatorio.age_codigo.age_descricao
-    } for relatorio in relatorios]
-
-    return Response(resultados_formatados)
+    relatorios = paginator.paginate_queryset(relatorios, request)
+    serializer = RelatorioSerializer(relatorios, many=True)
+    return paginator.get_paginated_response(serializer.data)
     
 def list_all_lojas_byfilter(id)->Response:
     areasId = AreaComercial.objects.filter(usuarioareacomercial__usuario_id = id)
