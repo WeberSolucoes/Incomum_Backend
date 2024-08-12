@@ -28,6 +28,7 @@ urlpatterns = [
 
     #Relatorio
     path('relatorio/list-all-by-filter/', relatorioViews.list_all_byfilter),
+    path('relatorio/total-by-filter/', relatorioViews.total_byfilter),
     path('relatorio/loja-by-user/<int:id>/', relatorioViews.list_all_lojas_byfilter),
     path('relatorio/area-by-user/<int:id>/', relatorioViews.list_all_areas_byfilter),
     path('relatorio/vendedor-by-user/<int:id>/', relatorioViews.list_all_vendedores_byfilter),
