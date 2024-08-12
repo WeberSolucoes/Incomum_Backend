@@ -2,6 +2,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from typing import List
 from decouple import config
+import re
 
 from django.db.utils import IntegrityError
 from django.contrib.auth.tokens import default_token_generator
@@ -99,6 +100,9 @@ def update_password(request) -> Response:
 def update_password_confirm(request, uidb64, token) -> Response:
     serializer = PasswordSerializer(data=request.data)
     if serializer.is_valid():
+        regex = r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\W).{8,}$'
+        if not bool(re.match(regex,serializer.validated_data.get('new_password'))):
+            return Response({'message': 'Senha inválido, deve conter pelo menos 8 caracteres, uma letra maiúscula, uma letra minuscula e um caractere especial'} ,status=status.HTTP_400_BAD_REQUEST)
         try:
             uid = force_str(urlsafe_base64_decode(uidb64))
             user = User.objects.get(pk=uid)
