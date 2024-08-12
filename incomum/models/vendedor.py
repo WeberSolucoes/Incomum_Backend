@@ -4,6 +4,7 @@ from autenticacaoWeber.models.usuario import Usuario
 
 class Vendedor(models.Model):
     ven_codigo = models.AutoField(primary_key=True)  # Assuming this field is auto-incrementing
+    ven_descricao = models.CharField(max_length=60, null=True, blank=True)
     ban_codigo = models.IntegerField(null=True, blank=True)
     ven_agencia = models.CharField(max_length=7, null=True, blank=True)
     ven_contacorrente = models.CharField(max_length=15, null=True, blank=True)

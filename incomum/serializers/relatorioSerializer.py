@@ -11,6 +11,7 @@ class RelatorioSerializer(serializers.ModelSerializer):
     fim_markup = serializers.SerializerMethodField()
     fim_valorinc = serializers.SerializerMethodField()
     fim_valorincajustado = serializers.SerializerMethodField()
+    ven_descricao = serializers.SerializerMethodField()
 
     class Meta:
         model = Relatorio
@@ -27,8 +28,12 @@ class RelatorioSerializer(serializers.ModelSerializer):
             'fim_valorinc',
             'fim_valorincajustado',
             'nome_loja',
-            'aco_descricao'
+            'aco_descricao',
+            'ven_descricao'
         ]
+
+    def get_ven_descricao(self, obj):
+        return obj.ven_codigo.ven_descricao if obj.ven_codigo else None
 
     def get_nome_loja(self, obj):
         return obj.age_codigo.age_descricao if obj.loj_codigo else None
