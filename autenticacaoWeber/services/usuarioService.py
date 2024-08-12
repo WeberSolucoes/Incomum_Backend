@@ -70,8 +70,9 @@ def update_password(request) -> Response:
             user: User = User.objects.get(email=email)
             token = default_token_generator.make_token(user)
             uid = urlsafe_base64_encode(force_bytes(user.pk))
+            host = request.get_host()
             reset_link = request.build_absolute_uri(
-                f'http://localhost:5173/redefinir-senha/{uid}/{token}/'
+                f'{host}/redefinir-senha/{uid}/{token}/'
             )
             message = f"""
             <p>Ola {user.username},</p>
