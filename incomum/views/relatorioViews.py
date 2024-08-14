@@ -65,3 +65,4 @@ def list_all_vendedores_byfilter(request,id):
 @permission_classes([IsAuthenticated])
 def list_all_agencias_byfilter(request,id):
     return relatorioService.list_all_agencias_byfilter(request, id)
+
