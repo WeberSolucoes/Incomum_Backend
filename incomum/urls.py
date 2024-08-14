@@ -33,5 +33,6 @@ urlpatterns = [
     path('relatorio/area-by-user/<int:id>/', relatorioViews.list_all_areas_byfilter),
     path('relatorio/vendedor-by-user/<int:id>/', relatorioViews.list_all_vendedores_byfilter),
     path('relatorio/agencia-by-user/<int:id>/', relatorioViews.list_all_agencias_byfilter),
+    path('relatorio/download-relatorio/', relatorioViews.create_excel_byfilter),
 
 ]

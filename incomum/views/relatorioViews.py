@@ -65,3 +65,13 @@ def list_all_vendedores_byfilter(request,id):
 @permission_classes([IsAuthenticated])
 def list_all_agencias_byfilter(request,id):
     return relatorioService.list_all_agencias_byfilter(request, id)
+
+
+@swagger_auto_schema(
+        methods=['get'],
+        tags=['Relatorio'])
+@api_view(['GET'])
+@authentication_classes([JWTAuthentication])
+@permission_classes([IsAuthenticated])
+def create_excel_byfilter(request):
+    return relatorioService.create_excel_byfilter(request)
