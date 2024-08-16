@@ -271,3 +271,7 @@ def list_all_agencias_byfilter(request, id) -> Response:
         agencias = agencias.filter(aco_codigo__in=areasComerciais)
 
     return Response(agencias)
+
+def list_all_areas(request) -> Response:
+    areas = AreaComercial.objects.all().values("aco_codigo", "aco_descricao")
+    return Response(list(areas))
