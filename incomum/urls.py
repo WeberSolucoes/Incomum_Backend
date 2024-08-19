@@ -1,7 +1,7 @@
 from django import views
 from django.urls import path
 
-from .views import areaComercialViews, lojaViews, usuarioComercialViews, relatorioViews, relatorioViews
+from .views import areaComercialViews, lojaViews, usuarioComercialViews, relatorioViews, relatorioViews,agenciaViews
 urlpatterns = [
 
     #AreaComercial
@@ -18,6 +18,13 @@ urlpatterns = [
     path('loja/update/<int:id>/', lojaViews.update),
     path('loja/delete/<int:id>/', lojaViews.delete),
     path('loja/list-all/', lojaViews.list_all),
+
+    #Agencia
+    path('agencia/find-byid/<int:id>/', agenciaViews.find_by_id),
+    path('agencia/create/', agenciaViews.create),
+    path('agencia/update/<int:id>/', agenciaViews.update),
+    path('agencia/delete/<int:id>/', agenciaViews.delete),
+    path('agencia/list-all/', agenciaViews.list_all),
 
     #UsuarioComercial
     path('usuario_comercial/find-byid/<int:id>/', usuarioComercialViews.find_by_id),
