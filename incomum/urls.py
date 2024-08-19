@@ -1,7 +1,7 @@
 from django import views
 from django.urls import path
 
-from .views import areaComercialViews, lojaViews, usuarioComercialViews, relatorioViews, relatorioViews,agenciaViews
+from .views import areaComercialViews, lojaViews, usuarioComercialViews, relatorioViews, relatorioViews,agenciaViews,vendedorViews
 urlpatterns = [
 
     #AreaComercial
@@ -43,4 +43,10 @@ urlpatterns = [
     path('relatorio/download-relatorio/', relatorioViews.create_excel_byfilter),
     path('relatorio/list-all-areas/', relatorioViews.list_all_areas),
 
+    #Vendedor
+    path('vendedor/find-byid/<int:id>/', vendedorViews.find_by_id),
+    path('vendedor/create/', vendedorViews.create),
+    path('vendedor/update/<int:id>/', vendedorViews.update),
+    path('vendedor/delete/<int:id>/', vendedorViews.delete),
+    path('vendedor/list-all/', vendedorViews.list_all),
 ]
