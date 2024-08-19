@@ -2,7 +2,7 @@ from django.db import models
 
 class Agencia(models.Model):
     age_codigo = models.AutoField(primary_key=True)
-    age_descricao = models.CharField(max_length=70, null=True, blank=True)
+    age_descricao = models.CharField(max_length=70)
     age_endereco = models.CharField(max_length=60, null=True, blank=True)
     age_numero = models.CharField(max_length=20, null=True, blank=True)
     age_bairro = models.CharField(max_length=35, null=True, blank=True)
@@ -28,7 +28,7 @@ class Agencia(models.Model):
     age_verificar = models.CharField(max_length=1, null=True, blank=True)
     age_inscricaomunicipal = models.CharField(max_length=20, null=True, blank=True)
     age_markup = models.FloatField(null=True, blank=True)
-    aco_codigo = models.IntegerField(null=True, blank=True)
+    aco_codigo = models.ForeignKey('AreaComercial', on_delete=models.DO_NOTHING, db_column='aco_codigo', null=True, blank=True)
     age_markupliberado = models.FloatField(null=True, blank=True)
     age_codigoprincipal = models.IntegerField(null=True, blank=True)
     age_codigoimportacao = models.IntegerField(null=True, blank=True)
