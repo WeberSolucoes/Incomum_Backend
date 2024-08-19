@@ -66,6 +66,14 @@ def list_all_vendedores_byfilter(request,id):
 def list_all_agencias_byfilter(request,id):
     return relatorioService.list_all_agencias_byfilter(request, id)
 
+@swagger_auto_schema(
+        methods=['get'],
+        tags=['Relatorio'])
+@api_view(['GET'])
+@authentication_classes([JWTAuthentication])
+@permission_classes([IsAuthenticated])
+def list_all_areas(request):
+    return relatorioService.list_all_areas(request)
 
 @swagger_auto_schema(
         methods=['get'],
