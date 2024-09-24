@@ -50,7 +50,7 @@ def register_user(request):
     responses={200: UserIdSerializer},
 )
 @api_view(['GET'])
-@permission_classes([IsAuthenticated])
+@permission_classes([AllowAny])
 def user_id(request):
     return Response(UserIdSerializer(request.user).data)
 

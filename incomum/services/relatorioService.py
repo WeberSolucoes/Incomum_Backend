@@ -23,9 +23,6 @@ def total_byfilter(request) -> Response:
     data_inicio = request.query_params.get("dataInicio")
     data_fim = request.query_params.get("dataFim")
 
-    usuario_id = request.query_params.get("usuario_id")
-    user_unidades = list_all_lojas_byfilter(usuario_id).data
-    user_unidades = [id["loj_codigo"] for id in user_unidades]
 
     if data_inicio is None or data_fim is None:
         return Response(
@@ -53,9 +50,7 @@ def total_byfilter(request) -> Response:
     vendedores = request.query_params.getlist("vendedor")
 
     relatorios = (
-        Relatorio.objects.filter(fim_data__range=[data_inicio, data_fim])
-        .filter(loj_codigo__in=user_unidades)
-        .values("fim_valorliquido", "fim_valorinc", "fim_valorincajustado")
+        Relatorio.objects.all()
     )
     if len(unidades) > 0:
         relatorios = relatorios.filter(loj_codigo__in=unidades)
@@ -121,9 +116,6 @@ def list_all_byfilter(request) -> Response:
     relatorios = Relatorio.objects.filter(fim_data__range=[data_inicio, data_fim])
     if unidades:
         relatorios = relatorios.filter(loj_codigo__in=unidades)
-
-    if areaComerciais:
-        relatorios = relatorios.filter(aco_codigo__in=areaComerciais)
 
     if agencias:
         relatorios = relatorios.filter(age_codigo__in=agencias)
