@@ -11,7 +11,6 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 
 from pathlib import Path
-from decouple import config
 import os
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -135,12 +134,12 @@ DATABASE_PORT = config('DATABASE_PORT')
 
 DATABASES = {
      'default': {
-         'ENGINE': 'django.db.backends.postgresql',
-         'NAME': DATABASE_NAME,
-         'USER': DATABASE_USER,
-         'PASSWORD': DATABASE_PASSWORD,
-         'HOST': DATABASE_HOST,
-         'PORT': DATABASE_PORT,
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'viagem',
+        'USER': 'webersolucoes',
+        'PASSWORD': 'Wr$solucoes$10!',
+        'HOST': 'viagem2.cxquqa64410g.us-east-2.rds.amazonaws.com',
+        'PORT': '5432',
      }
  }
 
