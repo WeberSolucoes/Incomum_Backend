@@ -1,7 +1,6 @@
 from rest_framework.response import Response
 from rest_framework import status
 from typing import List
-from decouple import config
 import re
 
 from django.db.utils import IntegrityError
