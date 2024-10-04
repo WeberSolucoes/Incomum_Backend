@@ -12,7 +12,6 @@ from ..models import *
 from ..services import relatorioService
 from rest_framework.permissions import AllowAny
 
-
 @swagger_auto_schema(
         methods=['get'],
         tags=['Relatorio'])
@@ -37,8 +36,8 @@ def total_byfilter(request):
 @api_view(['GET'])
 @authentication_classes([JWTAuthentication])
 @permission_classes([AllowAny])
-def list_all_lojas_byfilter(request,id):
-    return relatorioService.list_all_lojas_byfilter(id)
+def list_all_lojas_byfilter(request):
+    return relatorioService.list_all_lojas_byfilter(request)
 
 @swagger_auto_schema(
         methods=['get'],
@@ -46,8 +45,8 @@ def list_all_lojas_byfilter(request,id):
 @api_view(['GET'])
 @authentication_classes([JWTAuthentication])
 @permission_classes([AllowAny])
-def list_all_areas_byfilter(request,id):
-    return relatorioService.list_all_areas_byfilter(request, id)
+def list_all_areas_byfilter(request):
+    return relatorioService.list_all_areas_byfilter(request)
 
 @swagger_auto_schema(
         methods=['get'],
@@ -55,8 +54,8 @@ def list_all_areas_byfilter(request,id):
 @api_view(['GET'])
 @authentication_classes([JWTAuthentication])
 @permission_classes([AllowAny])
-def list_all_vendedores_byfilter(request,id):
-    return relatorioService.list_all_vendedores_byfilter(request, id)
+def list_all_vendedores_byfilter(request):
+    return relatorioService.list_all_vendedores_byfilter(request)
 
 @swagger_auto_schema(
         methods=['get'],
@@ -64,8 +63,8 @@ def list_all_vendedores_byfilter(request,id):
 @api_view(['GET'])
 @authentication_classes([JWTAuthentication])
 @permission_classes([AllowAny])
-def list_all_agencias_byfilter(request,id):
-    return relatorioService.list_all_agencias_byfilter(request, id)
+def list_all_agencias_byfilter(request):
+    return relatorioService.list_all_agencias_byfilter(request)
 
 @swagger_auto_schema(
         methods=['get'],
