@@ -8,17 +8,19 @@ from incomum.models.vendedor import Vendedor
 class Relatorio(models.Model):
     fim_codigo = models.AutoField(primary_key=True)  # Assuming this field is auto-incrementing
     tur_codigo = models.IntegerField()
-    loj_codigo = models.ForeignKey(Loja, on_delete=models.DO_NOTHING, db_column='loj_codigo', null=True, blank=True)
-    ven_codigo = models.ForeignKey(Vendedor, on_delete=models.DO_NOTHING, db_column='ven_codigo', null=True, blank=True)
-    age_codigo = models.ForeignKey(Agencia, on_delete=models.DO_NOTHING, db_column='age_codigo', null=True, blank=True)
     fim_data = models.DateField()
-    aco_codigo = models.ForeignKey(AreaComercial, on_delete=models.DO_NOTHING, db_column='aco_codigo', null=True, blank=True)
     fim_tipo = models.CharField(max_length=10)
     tur_numerovenda = models.CharField(max_length=20)
     fim_valorliquido = models.FloatField()
     fim_markup = models.FloatField()
     fim_valorinc = models.FloatField()
     fim_valorincajustado = models.FloatField()
+    aco_codigo = models.IntegerField()
+    loj_codigo = models.IntegerField()
+    age_codigo = models.IntegerField()
+    ven_codigo = models.IntegerField()
+
+
 
     class Meta:
         db_table = 'faturamentosimplificado'
