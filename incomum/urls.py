@@ -1,8 +1,12 @@
 from django import views
 from django.urls import path
+from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
-from .views import areaComercialViews, lojaViews, usuarioComercialViews, relatorioViews, relatorioViews,agenciaViews,vendedorViews
+from .views import areaComercialViews, lojaViews, usuarioComercialViews, relatorioViews, relatorioViews,agenciaViews,vendedorViews,userViews
 urlpatterns = [
+
+    path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
 
     #AreaComercial
     path('areacomercial/find-byid/<int:id>/', areaComercialViews.find_by_id) ,
@@ -36,10 +40,10 @@ urlpatterns = [
     #Relatorio
     path('relatorio/list-all-by-filter/', relatorioViews.list_all_byfilter),
     path('relatorio/total-by-filter/', relatorioViews.total_byfilter),
-    path('relatorio/loja-by-user/<int:id>/', relatorioViews.list_all_lojas_byfilter),
-    path('relatorio/area-by-user/<int:id>/', relatorioViews.list_all_areas_byfilter),
-    path('relatorio/vendedor-by-user/<int:id>/', relatorioViews.list_all_vendedores_byfilter),
-    path('relatorio/agencia-by-user/<int:id>/', relatorioViews.list_all_agencias_byfilter),
+    path('relatorio/loja-by-user/', relatorioViews.list_all_lojas_byfilter),
+    path('relatorio/area-by-user/', relatorioViews.list_all_areas_byfilter),
+    path('relatorio/vendedor-by-user/', relatorioViews.list_all_vendedores_byfilter),
+    path('relatorio/agencia-by-user/', relatorioViews.list_all_agencias_byfilter),
     path('relatorio/download-relatorio/', relatorioViews.create_excel_byfilter),
     path('relatorio/list-all-areas/', relatorioViews.list_all_areas),
 
@@ -49,4 +53,7 @@ urlpatterns = [
     path('vendedor/update/<int:id>/', vendedorViews.update),
     path('vendedor/delete/<int:id>/', vendedorViews.delete),
     path('vendedor/list-all/', vendedorViews.list_all),
+
+    #Usuario
+    path('usuario/login/', userViews.login),
 ]
