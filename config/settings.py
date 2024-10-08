@@ -45,10 +45,8 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt',
     'corsheaders',
     #Local Apps
-    'autenticacaoWeber',
     'incomum',
 ]
-AUTH_USER_MODEL = 'autenticacaoWeber.Usuario'
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
