@@ -1,6 +1,5 @@
 from django.db import models
 
-from autenticacaoWeber.models.usuario import Usuario
 
 class Vendedor(models.Model):
     ven_codigo = models.AutoField(primary_key=True)  # Assuming this field is auto-incrementing
