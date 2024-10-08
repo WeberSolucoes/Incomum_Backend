@@ -8,12 +8,15 @@ import os
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.pagination import PageNumberPagination
-
+from django.contrib.auth.models import User
 from django.db.models import Sum
 from django.contrib.auth.decorators import login_required
 from incomum.serializers.vendedorSerializer import VendedorSerializer
 from incomum.serializers import agenciaSerializer
+from incomum.serializers.relatorioSerializer import RelatorioSerializer
 from incomum.serializers.lojaSerializer import LojaSerializer
+from datetime import datetime
+from django.db import connection
 
 from ..models import *
 from ..serializers.relatorioSerializer import *
@@ -83,45 +86,91 @@ def total_byfilter(request) -> Response:
     )
     return Response(totais, status=status.HTTP_200_OK)
 
+
 def list_all_byfilter(request):
-    # Obtenha os parâmetros da requisição
-    data_inicio = request.GET.get('dataInicio')
-    data_fim = request.GET.get('dataFim')
-    unidades = request.GET.get('unidades')
-    areas_comerciais = request.GET.get('areasComerciais')
-    agencias = request.GET.get('agencias')
-    vendedores = request.GET.get('vendedores')
+    user_id = request.user.id
+    data_consulta = request.GET.get('dataInicio')
+    data_consulta_final = request.GET.get('dataFim')
+    unidade_selecionada = request.GET.get('unidades')
+    areas_selecionadas = request.GET.getlist('areasComerciais')
+    agencia_selecionada = request.GET.get('agencias')
+    vendedor_selecionada = request.GET.get('vendedores')
+    print(areas_selecionadas)
 
-    queryset = Relatorio.objects.all()  # Inicie com todos os registros
+    # Consultando as áreas do usuário
+    with connection.cursor() as cursor:
+        cursor.execute("""
+            SELECT ac.aco_codigo
+            FROM usuariocomercial ac
+            INNER JOIN auth_user uac ON uac.id = ac.usr_codigo
+            WHERE uac.id = %s
+        """, [user_id])
+        user_areas = [row[0] for row in cursor.fetchall()]
 
-    # Filtre pela data
-    if data_inicio and data_fim:
-        queryset = queryset.filter(fim_data__gte=data_inicio, fim_data__lte=data_fim)
+    # Validando as datas
+    try:
+        data_consulta_dt = datetime.strptime(data_consulta, "%Y-%m-%d")
+        data_consulta_final_dt = datetime.strptime(data_consulta_final, "%Y-%m-%d")
+    except ValueError:
+        return Response(
+            {"message": "Datas inválidas. Use o formato YYYY-MM-DD."},
+            status=status.HTTP_400_BAD_REQUEST
+        )
 
-    # Filtre por unidades
-    if unidades:
-        unidade_ids = unidades.split(',')
-        queryset = queryset.filter(loj_codigo__in=unidade_ids)
+    # Construindo a query base
+    query = """
+        SELECT fim_tipo, tur_numerovenda, tur_codigo, fim_valorliquido, fim_data, fim_markup, fim_valorinc, fim_valorincajustado, aco_descricao, age_descricao, ven_descricao, fat_valorvendabruta
+        FROM faturamentosimplificado 
+        WHERE fim_data BETWEEN %s AND %s 
+    """
+    params = [data_consulta_dt, data_consulta_final_dt]
 
-    # Filtre por áreas comerciais
-    if areas_comerciais:
-        area_ids = areas_comerciais.split(',')
-        queryset = queryset.filter(aco_codigo__in=area_ids)
+    # Adicionando filtros à consulta com base nas seleções
+    if user_areas:
+        query += " AND aco_codigo IN %s"
+        params.append(tuple(user_areas))
 
-    # Filtre por agências
-    if agencias:
-        agencia_ids = agencias.split(',')
-        queryset = queryset.filter(age_codigo__in=agencia_ids)
+    if unidade_selecionada:
+        query += " AND loj_codigo = %s"
+        params.append(unidade_selecionada)
 
-    # Filtre por vendedores
-    if vendedores:
-        vendedor_ids = vendedores.split(',')
-        queryset = queryset.filter(ven_codigo__in=vendedor_ids)
+    if areas_selecionadas and len(areas_selecionadas) > 0:
+        query += " AND aco_codigo IN %s"
+        params.append(tuple(areas_selecionadas))
 
-    # Serialização e retorno dos dados
-    serializer = RelatorioSerializer(queryset, many=True)
-    return Response(serializer.data)
+    if agencia_selecionada:
+        query += " AND age_codigo = %s"
+        params.append(agencia_selecionada)
 
+    if vendedor_selecionada:
+        query += " AND ven_codigo = %s"
+        params.append(vendedor_selecionada)
+
+    query += " ORDER BY fim_data"
+
+    # Executando a consulta e obtendo os resultados
+    with connection.cursor() as cursor:
+        cursor.execute(query, params)
+        resultados = cursor.fetchall()
+
+    # Formatando os resultados com o serializer
+    resultados_formatados = [RelatorioSerializer({
+        'fim_tipo': resultado[0],
+        'tur_numerovenda': resultado[1],
+        'tur_codigo': resultado[2],
+        'fim_valorliquido': resultado[3],
+        'fim_data': resultado[4],
+        'fim_markup': resultado[5],
+        'fim_valorinc': resultado[6],
+        'fim_valorincajustado': resultado[7],
+        'aco_descricao': resultado[8],
+        'age_descricao': resultado[9],
+        'ven_descricao': resultado[10],
+        'fat_valorvendabruta': resultado[11],
+    }).data for resultado in resultados]
+
+
+    return Response({'resultados': resultados_formatados}, status=status.HTTP_200_OK)
 
 
 def list_all_lojas_byfilter(request):
@@ -136,81 +185,229 @@ def list_all_lojas_byfilter(request):
     return Response(serializer.data)
 
 def list_all_areas_byfilter(request) -> Response:
-    areas = AreaComercial.objects.all().values('aco_descricao','aco_codigo')  # Carrega as lojas relacionadas
-    return Response(areas)
+    user_id = request.user.id
+
+    # Verificar áreas comerciais associadas ao usuário
+    with connection.cursor() as cursor:
+        cursor.execute("""
+            SELECT ac.aco_codigo, a.aco_descricao
+            FROM usuariocomercial ac
+            INNER JOIN areacomercial a ON a.aco_codigo = ac.aco_codigo
+            WHERE ac.usr_codigo = %s
+        """, [user_id])
+        user_areas = cursor.fetchall()
+
+    if request.method == 'GET':
+        unidade_selecionada = request.GET.get('unidade')
+
+        if user_areas:
+            # Se o usuário tem áreas associadas, mostrar apenas essas áreas
+            associacoes = [
+                {'aco_codigo': row[0], 'aco_descricao': row[1]}
+                for row in user_areas
+            ]
+        else:
+            # Se o usuário não tem áreas associadas, realizar a consulta com base na unidade
+            with connection.cursor() as cursor:
+                if unidade_selecionada:
+                    cursor.execute("""
+                        SELECT lc.aco_codigo, a.aco_descricao
+                        FROM lojacomercial lc
+                        INNER JOIN areacomercial a ON lc.aco_codigo = a.aco_codigo
+                        WHERE lc.loj_codigo = %s ORDER BY aco_descricao
+                    """, [unidade_selecionada])
+                else:
+                    cursor.execute("""
+                        SELECT a.aco_codigo, a.aco_descricao
+                        FROM areacomercial a ORDER BY aco_descricao
+                    """)
+
+                resultados = cursor.fetchall()
+
+            # Formatar os resultados como uma lista de dicionários
+            associacoes = [
+                {'aco_codigo': row[0], 'aco_descricao': row[1]}
+                for row in resultados
+            ]
+
+        return Response({'associacoes': associacoes})
 
 
 
 def list_all_vendedores_byfilter(request):
-    # Filtre os vendedores conforme necessário, por exemplo:
-    # vendedores = Vendedor.objects.filter(some_condition)
-    vendedores = Vendedor.objects.all()  # Obtém todos os vendedores
+    user_id = request.user.id  # Obtém o ID do usuário logado
 
-    # Serializa os vendedores
-    serializer = VendedorSerializer(vendedores, many=True)
+    # Obtém os aco_codigo associados ao usuário logado
+    with connection.cursor() as cursor:
+        cursor.execute("""
+            SELECT ac.aco_codigo
+            FROM usuariocomercial ac
+            INNER JOIN auth_user uac ON uac.id = ac.usr_codigo
+            WHERE uac.id = %s
+        """, [user_id])
+        user_areas = [row[0] for row in cursor.fetchall()]
 
-    # Retorna a resposta com os dados serializados
-    return Response(serializer.data)
+    if not user_areas:
+        # Se não houver aco_codigo, retornamos todos os vendedores
+        with connection.cursor() as cursor:
+            cursor.execute("""
+                SELECT v.ven_codigo, v.ven_descricao
+                FROM vendedor v
+                ORDER BY v.ven_descricao
+            """)
+            vendedores = cursor.fetchall()
+    else:
+        # Consulta os vendedores baseados na aco_codigo do usuário
+        with connection.cursor() as cursor:
+            cursor.execute("""
+                SELECT DISTINCT v.ven_codigo, v.ven_descricao
+                FROM faturamentosimplificado f
+                JOIN vendedor v ON v.ven_codigo = f.ven_codigo
+                WHERE f.aco_codigo IN %s
+                ORDER BY v.ven_descricao
+            """, [tuple(user_areas)])
+            vendedores = cursor.fetchall()
+
+    vendedores_formatados = [{
+        'ven_codigo': ven[0],
+        'ven_descricao': ven[1]
+    } for ven in vendedores]
+
+    return Response({'vende': vendedores_formatados})
+
+
 
 def list_all_agencias_byfilter(request) -> Response:
-    agencias = Agencia.objects.all().values("age_codigo", "age_descricao")
-    areasComerciais = request.query_params.getlist("areaComercial")
+    user_id = request.user.id  # Obtém o ID do usuário logado
 
-    if areasComerciais:
-        agencias = agencias.all()
+    # Obter o aco_codigo associado ao usuário
+    with connection.cursor() as cursor:
+        cursor.execute("""
+            SELECT ac.aco_codigo
+            FROM usuariocomercial ac
+            INNER JOIN auth_user uac ON uac.id = ac.usr_codigo
+            WHERE uac.id = %s
+        """, [user_id])
+        user_aco_codigos = [row[0] for row in cursor.fetchall()]
 
-    return Response(agencias)
+    if user_aco_codigos:
+        # Buscar as agências associadas ao(s) aco_codigo do usuário
+        with connection.cursor() as cursor:
+            cursor.execute("""
+                SELECT a.age_codigo, a.age_descricao
+                FROM agencia a
+                WHERE a.aco_codigo IN %s
+            """, [tuple(user_aco_codigos)])
+            resultados = cursor.fetchall()
+    else:
+        # Se não houver aco_codigo, retornar todas as agências
+        with connection.cursor() as cursor:
+            cursor.execute("""
+                SELECT a.age_codigo, a.age_descricao
+                FROM agencia a
+                ORDER BY a.age_descricao
+            """)
+            resultados = cursor.fetchall()
+
+    # Formatar os resultados como uma lista de dicionários
+    valores = [
+        {'age_codigo': row[0], 'age_descricao': row[1]}
+        for row in resultados
+    ]
+
+    return Response({'valores': valores}, status=status.HTTP_200_OK)
+
 
 
 
 def create_excel_byfilter(request) -> Response:
-    data_inicio = request.query_params.get("dataInicio")
-    data_fim = request.query_params.get("dataFim")
+    user_id = request.user.id
+    data_consulta = request.GET.get('dataInicio')
+    data_consulta_final = request.GET.get('dataFim')
+    unidade_selecionada = request.GET.get('unidades')
+    areas_selecionadas = request.GET.getlist('areasComerciais')
+    agencia_selecionada = request.GET.get('agencias')
+    vendedor_selecionada = request.GET.get('vendedores')
 
-    if data_inicio is None or data_fim is None:
-        return Response(
-            {"message": "Os parâmetros data inicial e data final são obrigatórios."},
-            status=status.HTTP_400_BAD_REQUEST,
-        )
+    # Consultando as áreas do usuário
+    with connection.cursor() as cursor:
+        cursor.execute("""
+            SELECT ac.aco_codigo
+            FROM usuariocomercial ac
+            INNER JOIN auth_user uac ON uac.id = ac.usr_codigo
+            WHERE uac.id = %s
+        """, [user_id])
+        user_areas = [row[0] for row in cursor.fetchall()]
 
+    # Validando as datas
     try:
-        data_inicio = datetime.datetime.strptime(data_inicio, "%d-%m-%Y")
-        data_fim = datetime.datetime.strptime(data_fim, "%d-%m-%Y")
-        if data_fim < data_inicio:
-            return Response(
-                {"message": "A data final deve ser maior que a data inicial."},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
+        data_consulta_dt = datetime.strptime(data_consulta, "%Y-%m-%d")
+        data_consulta_final_dt = datetime.strptime(data_consulta_final, "%Y-%m-%d")
     except ValueError:
         return Response(
-            {"message": "Data inválida. Use o formato DD-MM-YYYY."},
-            status=status.HTTP_400_BAD_REQUEST,
+            {"message": "Datas inválidas. Use o formato YYYY-MM-DD."},
+            status=status.HTTP_400_BAD_REQUEST
         )
 
-    unidades = request.query_params.getlist("unidade")
-    areaComerciais = request.query_params.getlist("areaComercial")
-    agencias = request.query_params.getlist("agencia")
-    vendedores = request.query_params.getlist("vendedor")
+    # Construindo a query base
+    query = """
+        SELECT fim_tipo, tur_numerovenda, tur_codigo, fim_valorliquido, fim_data, fim_markup, fim_valorinc, fim_valorincajustado, aco_descricao, age_descricao, ven_descricao, fat_valorvendabruta
+        FROM faturamentosimplificado 
+        WHERE fim_data BETWEEN %s AND %s 
+    """
+    params = [data_consulta_dt, data_consulta_final_dt]
 
-    relatorios = Relatorio.objects.filter(fim_data__range=[data_inicio, data_fim])
-    if unidades:
-        relatorios = relatorios.all()
+    # Adicionando filtros à consulta com base nas seleções
+    if user_areas:
+        query += " AND aco_codigo IN %s"
+        params.append(tuple(user_areas))
 
-    if areaComerciais:
-        relatorios = relatorios.all()
+    if unidade_selecionada:
+        query += " AND loj_codigo = %s"
+        params.append(unidade_selecionada)
 
-    if agencias:
-        relatorios = relatorios.filter(age_codigo__in=agencias)
+    if areas_selecionadas and len(areas_selecionadas) > 0:
+        query += " AND aco_codigo IN %s"
+        params.append(tuple(areas_selecionadas))
 
-    if vendedores:
-        relatorios = relatorios.filter(ven_codigo__in=vendedores)
+    if agencia_selecionada:
+        query += " AND age_codigo = %s"
+        params.append(agencia_selecionada)
 
+    if vendedor_selecionada:
+        query += " AND ven_codigo = %s"
+        params.append(vendedor_selecionada)
+
+    query += " ORDER BY fim_data"
+
+    # Executando a consulta e obtendo os resultados
+    with connection.cursor() as cursor:
+        cursor.execute(query, params)
+        resultados = cursor.fetchall()
+
+    # Formatando os resultados com o serializer
+    resultados_formatados = [RelatorioSerializer({
+        'fim_tipo': resultado[0],
+        'tur_numerovenda': resultado[1],
+        'tur_codigo': resultado[2],
+        'fim_valorliquido': resultado[3],
+        'fim_data': resultado[4],
+        'fim_markup': resultado[5],
+        'fim_valorinc': resultado[6],
+        'fim_valorincajustado': resultado[7],
+        'aco_descricao': resultado[8],
+        'age_descricao': resultado[9],
+        'ven_descricao': resultado[10],
+        'fat_valorvendabruta': resultado[11],
+    }).data for resultado in resultados]
+
+    # Chamar a função para processar os dados e gerar o Excel
+    excel_data = process_data_chunk(resultados_formatados)
+
+    # Retornar o Excel como resposta (pode ser modificado conforme necessário)
+    response = HttpResponse(excel_data, content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    response['Content-Disposition'] = 'attachment; filename="relatorio.xlsx"'
     return response
-
-    # Processa os chunks e cria o Excel conforme a implementação anterior.
-    # Código restante da geração do arquivo Excel
-
-
 
 
 def process_data_chunk(data_chunk):
@@ -225,123 +422,25 @@ def process_data_chunk(data_chunk):
         'MarkUp',
         'Income',
         'Income Ajustado',
-        'Área Comercial',
-        'Agência',
-        'Vendedor'
     ]
     ws.append(headers)
 
     for relatorio in data_chunk:
         ws.append([
-            relatorio.fim_tipo,
-            relatorio.tur_numerovenda,
-            relatorio.tur_codigo,
-            locale.currency(relatorio.fim_valorliquido, grouping=True),
-            relatorio.fim_data.strftime('%d/%m/%Y'),
-            round(relatorio.fim_markup, 4),
-            locale.currency(relatorio.fim_valorinc, grouping=True),
-            locale.currency(relatorio.fim_valorincajustado, grouping=True),
-            relatorio.age_codigo.age_descricao,
-            relatorio.ven_codigo.ven_descricao
+            relatorio['fim_tipo'],
+            relatorio['tur_numerovenda'],
+            relatorio['tur_codigo'],
+            locale.currency(relatorio['fim_valorliquido'], grouping=True),
+            relatorio['fim_data'],
+            round(relatorio['fim_markup'], 4),
+            locale.currency(relatorio['fim_valorinc'], grouping=True),
+            locale.currency(relatorio['fim_valorincajustado'], grouping=True),
         ])
 
     buffer = io.BytesIO()
     wb.save(buffer)
     buffer.seek(0)
     return buffer.getvalue()
-
-def create_excel_byfilter(request) -> Response:
-    data_inicio = request.query_params.get("dataInicio")
-    data_fim = request.query_params.get("dataFim")
-
-    if data_inicio is None or data_fim is None:
-        return Response(
-            {"message": "Os parâmetros data inicial e data final são obrigatórios."},
-            status=status.HTTP_400_BAD_REQUEST,
-        )
-
-    try:
-        data_inicio = datetime.datetime.strptime(data_inicio, "%d-%m-%Y")
-        data_fim = datetime.datetime.strptime(data_fim, "%d-%m-%Y")
-        if data_fim < data_inicio:
-            return Response(
-                {"message": "A data final deve ser maior que a data inicial."},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-    except ValueError:
-        return Response(
-            {"message": "Data inválida. Use o formato DD-MM-YYYY."},
-            status=status.HTTP_400_BAD_REQUEST,
-        )
-
-    unidades = request.query_params.getlist("unidade")
-    areaComerciais = request.query_params.getlist("areaComercial")
-    agencias = request.query_params.getlist("agencia")
-    vendedores = request.query_params.getlist("vendedor")
-
-    relatorios = Relatorio.objects.all()
-    if unidades:
-        relatorios = relatorios.all()
-
-    if areaComerciais:
-        relatorios = relatorios.all()
-
-    if agencias:
-        relatorios = relatorios.filter(age_codigo__in=agencias)
-
-    if vendedores:
-        relatorios = relatorios.filter(ven_codigo__in=vendedores)
-
-    # Divide os dados em chunks
-    num_chunks = os.cpu_count() or 4
-    chunk_size = len(relatorios) // num_chunks or 1
-    data_chunks = [relatorios[i:i + chunk_size] for i in range(0, len(relatorios), chunk_size)]
-
-    # Processa os chunks em paralelo
-    with ThreadPoolExecutor(max_workers=num_chunks) as executor:
-        results = list(executor.map(process_data_chunk, data_chunks))
-
-    wb = Workbook()
-    ws = wb.active
-    headers = [
-        'Tipo',
-        'Núm. Venda',
-        'Num. Pct',
-        'Valor Liquido Venda',
-        'Data',
-        'MarkUp',
-        'Income',
-        'Income Ajustado',
-        'Área Comercial',
-        'Agência',
-        'Vendedor'
-    ]
-    ws.append(headers)
-    # Cria o Excel final
-    ws.title = 'teste'
-
-    for result in results:
-        buffer = io.BytesIO(result)
-        wb_part = load_workbook(buffer)
-        ws_part = wb_part.active  # Assume que cada chunk tem apenas uma planilha
-        for row in ws_part.iter_rows(min_row=2, values_only=True):  # Pula o cabeçalho
-            ws.append(row)
-
-    # Adiciona totais
-    totais = total_byfilter(request).data
-    colunas = [4, 7, 8]
-    nomes = ['Total Valor Liquido', 'Total Income', 'Total Income Ajustado']
-    for i, chave in enumerate(totais.keys()):
-        ws.cell(row=len(relatorios) + 3, column=colunas[i]).value = nomes[i]
-        ws.cell(row=len(relatorios) + 4, column=colunas[i]).value = totais[chave]
-
-    buffer = io.BytesIO()
-    wb.save(buffer)
-    buffer.seek(0)
-
-    response = HttpResponse(buffer.getvalue(), content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
-    response['Content-Disposition'] = f'attachment; filename="{planilha_titulo}.xlsx"'
-    return response
 
 
 
