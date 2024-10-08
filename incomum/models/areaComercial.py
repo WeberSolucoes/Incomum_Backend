@@ -12,7 +12,3 @@ class AreaComercial(models.Model):
     class Meta:
         db_table = 'areacomercial'
         # managed = False  # Define como False se a tabela já existir no banco de dados e não quiser que o Django a gerencie
-        constraints = [
-            models.UniqueConstraint(fields=['aco_codigo'], name='pk_areacomercial')
-        ]
-        verbose_name_plural = "Áreas Comerciais"
