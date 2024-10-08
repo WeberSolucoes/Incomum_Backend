@@ -12,6 +12,7 @@ from ..models import *
 from ..services import relatorioService
 from rest_framework.permissions import AllowAny
 
+
 @swagger_auto_schema(
         methods=['get'],
         tags=['Relatorio'])
