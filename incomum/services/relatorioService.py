@@ -167,6 +167,7 @@ def list_all_byfilter(request):
         'age_descricao': resultado[9],
         'ven_descricao': resultado[10],
         'fat_valorvendabruta': resultado[11],
+        
     }).data for resultado in resultados]
 
 
