@@ -17,6 +17,7 @@ from incomum.serializers.relatorioSerializer import RelatorioSerializer
 from incomum.serializers.lojaSerializer import LojaSerializer
 from datetime import datetime
 from django.db import connection
+from django.core.paginator import Paginator
 
 from ..models import *
 from ..serializers.relatorioSerializer import *
