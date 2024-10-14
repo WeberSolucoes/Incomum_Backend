@@ -394,29 +394,19 @@ def create_excel_byfilter(request) -> Response:
         cursor.execute(query, params)
         resultados = cursor.fetchall()
 
-    resultados_formatados = []
-    valor_venda_bruta = locale.currency(relatorio.get('fat_valorvendabruta', 0), grouping=True)
-    for resultado in resultados:
-        try:
-            dados = RelatorioSerializer({
-                'fim_tipo': resultado[0],
-                'tur_numerovenda': resultado[1],
-                'tur_codigo': resultado[2],
-                'fim_valorliquido': resultado[3],
-                'fim_data': resultado[4],
-                'fim_markup': resultado[5],
-                'fim_valorinc': resultado[6],
-                'fim_valorincajustado': resultado[7],
-                'aco_descricao': resultado[8],
-                'age_descricao': resultado[9],
-                'ven_descricao': resultado[10],
-                 valor_venda_bruta,
-            }).data
-            resultados_formatados.append(dados)
-        except IndexError:
-            print(f"Registro com índice fora dos limites: {resultado}")
-        except KeyError as e:
-            print(f"Chave não encontrada: {e}")
+    resultados_formatados = [RelatorioSerializer({
+        'fim_tipo': resultado[0],
+        'tur_numerovenda': resultado[1],
+        'tur_codigo': resultado[2],
+        'fim_valorliquido': resultado[3],
+        'fim_data': resultado[4],
+        'fim_markup': resultado[5],
+        'fim_valorinc': resultado[6],
+        'fim_valorincajustado': resultado[7],
+        'aco_descricao': resultado[8],
+        'age_descricao': resultado[9],
+        'ven_descricao': resultado[10],
+    }).data for resultado in resultados]
 
     # Chamar a função para processar os dados e gerar o Excel
     excel_data = process_data_chunk(resultados_formatados)
@@ -442,14 +432,12 @@ def process_data_chunk(data_chunk):
         'Descrição Área Comercial',
         'Descrição Agência',
         'Descrição Vendedor',
-        'Valor Venda Bruta'
     ]
     ws.append(headers)
 
     total_valor_liquido = 0
     total_income = 0
     total_income_ajustado = 0
-    total_valor_venda_bruta = 0
 
     for relatorio in data_chunk:
         ws.append([
@@ -464,14 +452,12 @@ def process_data_chunk(data_chunk):
             relatorio['aco_descricao'],
             relatorio['age_descricao'],
             relatorio['ven_descricao'],
-            locale.currency(relatorio['fat_valorvendabruta'], grouping=True),
         ])
 
         # Acumulando os totais
         total_valor_liquido += relatorio['fim_valorliquido']
         total_income += relatorio['fim_valorinc']
         total_income_ajustado += relatorio['fim_valorincajustado']
-        total_valor_venda_bruta += relatorio['fat_valorvendabruta']
 
     # Adicionando a linha de totais
     ws.append([
@@ -486,7 +472,6 @@ def process_data_chunk(data_chunk):
         '',
         '',
         '',
-        locale.currency(total_valor_venda_bruta, grouping=True),
     ])
 
     buffer = io.BytesIO()
