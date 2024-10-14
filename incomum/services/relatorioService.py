@@ -395,6 +395,7 @@ def create_excel_byfilter(request) -> Response:
         resultados = cursor.fetchall()
 
     resultados_formatados = []
+    valor_venda_bruta = locale.currency(relatorio.get('fat_valorvendabruta', 0), grouping=True)
     for resultado in resultados:
         try:
             dados = RelatorioSerializer({
@@ -409,7 +410,7 @@ def create_excel_byfilter(request) -> Response:
                 'aco_descricao': resultado[8],
                 'age_descricao': resultado[9],
                 'ven_descricao': resultado[10],
-                'fat_valorvendabruta': resultado[11],
+                 valor_venda_bruta,
             }).data
             resultados_formatados.append(dados)
         except IndexError:
