@@ -407,7 +407,6 @@ def create_excel_byfilter(request) -> Response:
         'aco_descricao': resultado[8],
         'age_descricao': resultado[9],
         'ven_descricao': resultado[10],
-        'fat_valorvendabruta': resultado[11],
     }).data for resultado in resultados]
 
     # Chamar a função para processar os dados e gerar o Excel
@@ -431,8 +430,17 @@ def process_data_chunk(data_chunk):
         'MarkUp',
         'Income',
         'Income Ajustado',
+        'Descrição Área Comercial',
+        'Descrição Agência',
+        'Descrição Vendedor',
+        'Valor Venda Bruta'
     ]
     ws.append(headers)
+
+    total_valor_liquido = 0
+    total_income = 0
+    total_income_ajustado = 0
+    total_valor_venda_bruta = 0
 
     for relatorio in data_chunk:
         ws.append([
@@ -444,7 +452,31 @@ def process_data_chunk(data_chunk):
             round(relatorio['fim_markup'], 4),
             locale.currency(relatorio['fim_valorinc'], grouping=True),
             locale.currency(relatorio['fim_valorincajustado'], grouping=True),
+            relatorio['aco_descricao'],
+            relatorio['age_descricao'],
+            relatorio['ven_descricao'],
         ])
+
+        # Acumulando os totais
+        total_valor_liquido += relatorio['fim_valorliquido']
+        total_income += relatorio['fim_valorinc']
+        total_income_ajustado += relatorio['fim_valorincajustado']
+
+    # Adicionando a linha de totais
+    ws.append([
+        'Totais',
+        '',
+        '',
+        locale.currency(total_valor_liquido, grouping=True),
+        '',
+        '',
+        locale.currency(total_income, grouping=True),
+        locale.currency(total_income_ajustado, grouping=True),
+        '',
+        '',
+        '',
+        locale.currency(total_valor_venda_bruta, grouping=True),
+    ])
 
     buffer = io.BytesIO()
     wb.save(buffer)
