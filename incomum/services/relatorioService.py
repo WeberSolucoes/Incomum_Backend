@@ -394,21 +394,28 @@ def create_excel_byfilter(request) -> Response:
         cursor.execute(query, params)
         resultados = cursor.fetchall()
 
-    # Formatando os resultados com o serializer
-    resultados_formatados = [RelatorioSerializer({
-        'fim_tipo': resultado[0],
-        'tur_numerovenda': resultado[1],
-        'tur_codigo': resultado[2],
-        'fim_valorliquido': resultado[3],
-        'fim_data': resultado[4],
-        'fim_markup': resultado[5],
-        'fim_valorinc': resultado[6],
-        'fim_valorincajustado': resultado[7],
-        'aco_descricao': resultado[8],
-        'age_descricao': resultado[9],
-        'ven_descricao': resultado[10],
-        'fat_valorvendabruta': resultado[11],
-    }).data for resultado in resultados]
+    resultados_formatados = []
+    for resultado in resultados:
+        try:
+            dados = RelatorioSerializer({
+                'fim_tipo': resultado[0],
+                'tur_numerovenda': resultado[1],
+                'tur_codigo': resultado[2],
+                'fim_valorliquido': resultado[3],
+                'fim_data': resultado[4],
+                'fim_markup': resultado[5],
+                'fim_valorinc': resultado[6],
+                'fim_valorincajustado': resultado[7],
+                'aco_descricao': resultado[8],
+                'age_descricao': resultado[9],
+                'ven_descricao': resultado[10],
+                'fat_valorvendabruta': resultado[11],
+            }).data
+            resultados_formatados.append(dados)
+        except IndexError:
+            print(f"Registro com índice fora dos limites: {resultado}")
+        except KeyError as e:
+            print(f"Chave não encontrada: {e}")
 
     # Chamar a função para processar os dados e gerar o Excel
     excel_data = process_data_chunk(resultados_formatados)
