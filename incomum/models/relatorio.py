@@ -17,6 +17,7 @@ class Relatorio(models.Model):
     aco_descricao = models.CharField(max_length=20)
     ven_descricao = models.CharField(max_length=40)
     age_descricao = models.CharField(max_length=40)
+    fat_valorvendabruta = models.FloatField()
 
 
 
