@@ -407,6 +407,7 @@ def create_excel_byfilter(request) -> Response:
         'aco_descricao': resultado[8],
         'age_descricao': resultado[9],
         'ven_descricao': resultado[10],
+        'fat_valorvendabruta': resultado[11],
     }).data for resultado in resultados]
 
     # Chamar a função para processar os dados e gerar o Excel
@@ -455,12 +456,14 @@ def process_data_chunk(data_chunk):
             relatorio['aco_descricao'],
             relatorio['age_descricao'],
             relatorio['ven_descricao'],
+            locale.currency(relatorio['fat_valorvendabruta'], grouping=True),
         ])
 
         # Acumulando os totais
         total_valor_liquido += relatorio['fim_valorliquido']
         total_income += relatorio['fim_valorinc']
         total_income_ajustado += relatorio['fim_valorincajustado']
+        total_valor_venda_bruta += relatorio['fat_valorvendabruta']
 
     # Adicionando a linha de totais
     ws.append([
