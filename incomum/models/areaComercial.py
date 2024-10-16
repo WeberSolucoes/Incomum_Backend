@@ -7,7 +7,6 @@ class AreaComercial(models.Model):
     aco_datacadastro = models.DateTimeField(null=True, blank=True, auto_now_add=True)
     aco_situacao = models.IntegerField(null=True, blank=True)
     aco_rateio = models.IntegerField(null=True, blank=True)
-    loja_codigo = models.ForeignKey(Loja, on_delete=models.DO_NOTHING, db_column='loj_codigo', related_name='areaComercial', null=False)
 
     class Meta:
         db_table = 'areacomercial'
