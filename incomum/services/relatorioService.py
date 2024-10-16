@@ -15,6 +15,7 @@ from incomum.serializers.vendedorSerializer import VendedorSerializer
 from incomum.serializers import agenciaSerializer
 from incomum.serializers.relatorioSerializer import RelatorioSerializer
 from incomum.serializers.lojaSerializer import LojaSerializer
+from incomum.serializers.areaComercialSerializer import AreaComercialSerializer
 from datetime import datetime
 from django.db import connection
 from django.core.paginator import Paginator
@@ -492,4 +493,5 @@ def process_data_chunk(data_chunk):
 
 def list_all_areas(request) -> Response:
     areas = AreaComercial.objects.all()
-    return Response(list(areas))
+    serializer = AreaComercialSerializer(areas, many=True)  # Serialize os dados
+    return Response(serializer.data)
