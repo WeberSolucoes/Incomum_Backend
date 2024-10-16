@@ -117,69 +117,78 @@ def list_all_byfilter(request):
             status=status.HTTP_400_BAD_REQUEST
         )
 
-    # Construindo a query base com o ORM do Django
-    queryset = Relatorio.objects.filter(
-        fim_data__range=(data_consulta_dt, data_consulta_final_dt)
-    ).values(
-        'fim_tipo',
-        'tur_numerovenda',
-        'tur_codigo',
-        'fim_data',
-        'fim_markup',
-        'fim_valorinc',
-        'fim_valorincajustado',
-        'fim_valorliquido',
-        'aco_descricao',
-        'age_descricao',
-        'ven_descricao'
-    )
+    query = """
+        SELECT fim_tipo, tur_numerovenda, tur_codigo, fim_valorliquido, fim_data, fim_markup, fim_valorinc, fim_valorincajustado, aco_descricao, age_descricao, ven_descricao, fat_valorvendabruta
+        FROM faturamentosimplificado 
+        WHERE fim_data BETWEEN %s AND %s 
+    """
+    params = [data_consulta_dt, data_consulta_final_dt]
 
-    # Aplicando filtros adicionais
+    # Inclua a condição aco_codigo somente se user_areas não estiver vazio
     if user_areas:
-        queryset = queryset.filter(aco_codigo__in=user_areas)
+        query += " AND aco_codigo IN %s"
+        params.append(tuple(user_areas))
 
     if unidade_selecionada:
-        queryset = queryset.filter(loj_codigo=unidade_selecionada)
+        query += " AND loj_codigo = %s"
+        params.append(unidade_selecionada)
 
     if areas_selecionadas:
-        queryset = queryset.filter(aco_codigo__in=areas_selecionadas)
+        query += " AND aco_codigo IN %s"
+        params.append(tuple(areas_selecionadas))
 
     if agencia_selecionada:
-        queryset = queryset.filter(age_codigo=agencia_selecionada)
+        query += " AND age_codigo = %s"
+        params.append(agencia_selecionada)
 
     if vendedor_selecionada:
-        queryset = queryset.filter(ven_codigo=vendedor_selecionada)
+        query += " AND ven_codigo = %s"
+        params.append(vendedor_selecionada)
 
-    # Ordenando os resultados pela data
-    queryset = queryset.order_by('fim_data')
+    query += " ORDER BY fim_data"
+
+    # Executa a consulta e formata os resultados
+    with connection.cursor() as cursor:
+        cursor.execute(query, params)
+        resultados = cursor.fetchall()
+
+    # Formatando os resultados em dicionários
+    resultados_formatados = [{
+        'fim_tipo': resultado[0],
+        'tur_numerovenda': resultado[1],
+        'tur_codigo': resultado[2],
+        'fim_valorliquido': resultado[3],
+        'fim_data': resultado[4],
+        'fim_markup': resultado[5],
+        'fim_valorinc': resultado[6],
+        'fim_valorincajustado': resultado[7],
+        'aco_descricao': resultado[8],
+        'age_descricao': resultado[9],
+        'ven_descricao': resultado[10],
+        'fat_valorvendabruta': resultado[11],
+    } for resultado in resultados]
 
     # Paginação
-    paginator = Paginator(queryset, 100000)  # 100 resultados por página
+    paginator = Paginator(resultados_formatados, 100000)  # 100 resultados por página
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
 
-    # Formatando os resultados com o serializer
-    resultados_formatados = [RelatorioSerializer(resultado).data for resultado in page_obj]
-
     # Calculando as somas após aplicar os filtros
-    soma_totais = queryset.aggregate(
-        total_valorinc=Sum('fim_valorinc'),
-        total_valorincajustado=Sum('fim_valorincajustado'),
-        total_valorliquido=Sum('fim_valorliquido'),
-    )
+    soma_totais = {
+        'total_valorinc': sum(item['fim_valorinc'] for item in resultados_formatados if item['fim_valorinc'] is not None),
+        'total_valorincajustado': sum(item['fim_valorincajustado'] for item in resultados_formatados if item['fim_valorincajustado'] is not None),
+        'total_valorliquido': sum(item['fim_valorliquido'] for item in resultados_formatados if item['fim_valorliquido'] is not None),
+    }
 
     return Response({
-        'resultados': resultados_formatados,
+        'resultados': [RelatorioSerializer(resultado).data for resultado in page_obj],
         'num_paginas': paginator.num_pages,
         'pagina_atual': page_obj.number,
         'has_next': page_obj.has_next(),
         'has_previous': page_obj.has_previous(),
-        'soma_totais': {
-            'total_valorinc': soma_totais.get('total_valorinc', 0),
-            'total_valorincajustado': soma_totais.get('total_valorincajustado', 0),
-            'total_valorliquido': soma_totais.get('total_valorliquido', 0),
-        }
+        'soma_totais': soma_totais,
     }, status=status.HTTP_200_OK)
+
 
 
 def list_all_lojas_byfilter(request):
