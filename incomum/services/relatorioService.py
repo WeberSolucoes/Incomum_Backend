@@ -88,7 +88,6 @@ def total_byfilter(request) -> Response:
     )
     return Response(totais, status=status.HTTP_200_OK)
 
-
 def list_all_byfilter(request):
     user_id = request.user.id
     data_consulta = request.GET.get('dataInicio')
@@ -254,9 +253,12 @@ def list_all_areas_byfilter(request) -> Response:
 
 
 def list_all_vendedores_byfilter(request):
-    user_id = request.user.id  # Obtém o ID do usuário logado
+    user_id = request.user.id  # ID do usuário logado
+    unidade_id = request.GET.get('unidade')  # Unidade selecionada, se houver
 
-    # Obtém os aco_codigo associados ao usuário logado
+    vendedores = []
+
+    # Obtém os códigos de áreas comerciais associadas ao usuário logado
     with connection.cursor() as cursor:
         cursor.execute("""
             SELECT ac.aco_codigo
@@ -266,8 +268,20 @@ def list_all_vendedores_byfilter(request):
         """, [user_id])
         user_areas = [row[0] for row in cursor.fetchall()]
 
-    if not user_areas:
-        # Se não houver aco_codigo, retornamos todos os vendedores
+    # Se uma unidade for selecionada, buscar vendedores por unidade
+    if unidade_id:
+        with connection.cursor() as cursor:
+            cursor.execute("""
+                SELECT DISTINCT v.ven_codigo, v.ven_descricao
+                FROM faturamentosimplificado f
+                JOIN vendedor v ON v.ven_codigo = f.ven_codigo
+                WHERE f.loj_codigo = %s
+                ORDER BY v.ven_descricao
+            """, [unidade_id])
+            vendedores = cursor.fetchall()
+
+    # Caso contrário, retorna todos os vendedores
+    else:
         with connection.cursor() as cursor:
             cursor.execute("""
                 SELECT v.ven_codigo, v.ven_descricao
@@ -275,29 +289,17 @@ def list_all_vendedores_byfilter(request):
                 ORDER BY v.ven_descricao
             """)
             vendedores = cursor.fetchall()
-    else:
-        # Consulta os vendedores baseados na aco_codigo do usuário
-        with connection.cursor() as cursor:
-            cursor.execute("""
-                SELECT DISTINCT v.ven_codigo, v.ven_descricao
-                FROM faturamentosimplificado f
-                JOIN vendedor v ON v.ven_codigo = f.ven_codigo
-                WHERE f.aco_codigo IN %s
-                ORDER BY v.ven_descricao
-            """, [tuple(user_areas)])
-            vendedores = cursor.fetchall()
 
-    vendedores_formatados = [{
-        'ven_codigo': ven[0],
-        'ven_descricao': ven[1]
-    } for ven in vendedores]
+    vendedores_formatados = [{'ven_codigo': ven[0], 'ven_descricao': ven[1]} for ven in vendedores]
 
-    return Response({'vende': vendedores_formatados})
-
+    return Response({'vendedores': vendedores_formatados})
 
 
 def list_all_agencias_byfilter(request) -> Response:
     user_id = request.user.id  # Obtém o ID do usuário logado
+
+    # Obter o parâmetro area_comercial da consulta
+    area_comercial = request.GET.getlist('area_comercial[]')  # Isso captura todos os valores em uma lista
 
     # Obter o aco_codigo associado ao usuário
     with connection.cursor() as cursor:
@@ -309,24 +311,34 @@ def list_all_agencias_byfilter(request) -> Response:
         """, [user_id])
         user_aco_codigos = [row[0] for row in cursor.fetchall()]
 
-    if user_aco_codigos:
-        # Buscar as agências associadas ao(s) aco_codigo do usuário
-        with connection.cursor() as cursor:
+    print(f'Usuário aco_codigos: {user_aco_codigos}')
+    print(f'Área comercial para filtro: {area_comercial}')
+
+    with connection.cursor() as cursor:
+        if area_comercial:
+            # Se uma área comercial foi selecionada, filtrar por ela
             cursor.execute("""
-                SELECT a.age_codigo, a.age_descricao
-                FROM agencia a
-                WHERE a.aco_codigo IN %s
-            """, [tuple(user_aco_codigos)])
-            resultados = cursor.fetchall()
-    else:
-        # Se não houver aco_codigo, retornar todas as agências
-        with connection.cursor() as cursor:
-            cursor.execute("""
-                SELECT a.age_codigo, a.age_descricao
-                FROM agencia a
-                ORDER BY a.age_descricao
-            """)
-            resultados = cursor.fetchall()
+                SELECT age_codigo, age_descricao
+                FROM agencia
+                WHERE aco_codigo IN %s
+            """, [tuple(area_comercial)])
+        else:
+            # Se nenhuma área comercial foi selecionada, verificar user_aco_codigos
+            if user_aco_codigos:
+                # Filtrar as agências associadas ao(s) aco_codigo do usuário
+                cursor.execute("""
+                    SELECT age_codigo, age_descricao
+                    FROM agencia
+                    WHERE aco_codigo IN %s
+                """, [tuple(user_aco_codigos)])
+            else:
+                # Se não há aco_codigos para o usuário, puxar todos os registros
+                cursor.execute("""
+                    SELECT age_codigo, age_descricao
+                    FROM agencia
+                """)
+
+        resultados = cursor.fetchall()
 
     # Formatar os resultados como uma lista de dicionários
     valores = [
@@ -334,9 +346,7 @@ def list_all_agencias_byfilter(request) -> Response:
         for row in resultados
     ]
 
-    return Response({'valores': valores}, status=status.HTTP_200_OK)
-
-
+    return Response({'valores': valores})
 
 
 def create_excel_byfilter(request) -> Response:
@@ -404,6 +414,7 @@ def create_excel_byfilter(request) -> Response:
         cursor.execute(query, params)
         resultados = cursor.fetchall()
 
+    # Formatando os resultados com o serializer
     resultados_formatados = [RelatorioSerializer({
         'fim_tipo': resultado[0],
         'tur_numerovenda': resultado[1],
@@ -416,6 +427,7 @@ def create_excel_byfilter(request) -> Response:
         'aco_descricao': resultado[8],
         'age_descricao': resultado[9],
         'ven_descricao': resultado[10],
+        'fat_valorvendabruta': resultado[11],
     }).data for resultado in resultados]
 
     # Chamar a função para processar os dados e gerar o Excel
@@ -437,17 +449,14 @@ def process_data_chunk(data_chunk):
         'Valor Liquido Venda',
         'Data',
         'MarkUp',
-        'Income',
-        'Income Ajustado',
-        'Descrição Área Comercial',
-        'Descrição Agência',
-        'Descrição Vendedor',
+        'Valor Inc',
+        'Inc Ajustado',
+        'Area Comercial',
+        'Agencia',
+        'Vendedor',
+        'Valor Venda Bruta'
     ]
     ws.append(headers)
-
-    total_valor_liquido = 0
-    total_income = 0
-    total_income_ajustado = 0
 
     for relatorio in data_chunk:
         ws.append([
@@ -462,27 +471,8 @@ def process_data_chunk(data_chunk):
             relatorio['aco_descricao'],
             relatorio['age_descricao'],
             relatorio['ven_descricao'],
+            locale.currency(relatorio['fat_valorvendabruta'], grouping=True),
         ])
-
-        # Acumulando os totais
-        total_valor_liquido += relatorio['fim_valorliquido']
-        total_income += relatorio['fim_valorinc']
-        total_income_ajustado += relatorio['fim_valorincajustado']
-
-    # Adicionando a linha de totais
-    ws.append([
-        'Totais',
-        '',
-        '',
-        locale.currency(total_valor_liquido, grouping=True),
-        '',
-        '',
-        locale.currency(total_income, grouping=True),
-        locale.currency(total_income_ajustado, grouping=True),
-        '',
-        '',
-        '',
-    ])
 
     buffer = io.BytesIO()
     wb.save(buffer)
@@ -491,7 +481,45 @@ def process_data_chunk(data_chunk):
 
 
 
-def list_all_areas(request) -> Response:
-    areas = AreaComercial.objects.all()
-    serializer = AreaComercialSerializer(areas, many=True)  # Serialize os dados
-    return Response(serializer.data)
+def list_all_areas(request, unidade_id=None):
+    user_id = request.user.id
+    unidade_id = request.GET.get('unidade')
+    # Verificar áreas comerciais associadas ao usuário
+    with connection.cursor() as cursor:
+        cursor.execute("""
+            SELECT ac.aco_codigo, a.aco_descricao
+            FROM usuariocomercial ac
+            INNER JOIN areacomercial a ON a.aco_codigo = ac.aco_codigo
+            WHERE ac.usr_codigo = %s
+        """, [user_id])
+        user_areas = cursor.fetchall()
+
+    if user_areas:
+        associacoes = [
+            {'aco_codigo': row[0], 'aco_descricao': row[1]}
+            for row in user_areas
+        ]
+    else:
+        # Se o usuário não tem áreas associadas, realizar a consulta com base na unidade
+        with connection.cursor() as cursor:
+            if unidade_id:
+                cursor.execute("""
+                    SELECT lc.aco_codigo, a.aco_descricao
+                    FROM lojacomercial lc
+                    INNER JOIN areacomercial a ON lc.aco_codigo = a.aco_codigo
+                    WHERE lc.loj_codigo = %s ORDER BY aco_descricao
+                """, [unidade_id])
+            else:
+                cursor.execute("""
+                    SELECT a.aco_codigo, a.aco_descricao
+                    FROM areacomercial a ORDER BY aco_descricao
+                """)
+
+            resultados = cursor.fetchall()
+
+        associacoes = [
+            {'aco_codigo': row[0], 'aco_descricao': row[1]}
+            for row in resultados
+        ]
+
+    return Response({'associacoes': associacoes})
