@@ -46,8 +46,9 @@ def list_all_lojas_byfilter(request):
 @api_view(['GET'])
 @authentication_classes([JWTAuthentication])
 @permission_classes([AllowAny])
-def list_all_areas_byfilter(request):
-    return relatorioService.list_all_areas_byfilter(request)
+def list_all_areas(request, unidade_id=None):
+    # Chama a função de serviço passando a unidade_id (ou None)
+    return relatorioService.list_all_areas(request, unidade_id)
 
 @swagger_auto_schema(
         methods=['get'],
