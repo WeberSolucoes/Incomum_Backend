@@ -85,3 +85,12 @@ def list_all_areas(request, unidade_id=None):
 @permission_classes([AllowAny])
 def create_excel_byfilter(request):
     return relatorioService.create_excel_byfilter(request)
+
+@swagger_auto_schema(
+        methods=['get'],
+        tags=['Relatorio'])
+@api_view(['GET'])
+@authentication_classes([JWTAuthentication])
+@permission_classes([AllowAny])
+def list_all_area(request):
+    return relatorioService.create_excel_byfilter(request)
