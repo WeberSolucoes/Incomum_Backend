@@ -93,4 +93,4 @@ def create_excel_byfilter(request):
 @authentication_classes([JWTAuthentication])
 @permission_classes([AllowAny])
 def list_all_area(request):
-    return relatorioService.create_excel_byfilter(request)
+    return relatorioService.list_all_area(request)
