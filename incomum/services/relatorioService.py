@@ -479,7 +479,10 @@ def process_data_chunk(data_chunk):
     buffer.seek(0)
     return buffer.getvalue()
 
-
+def list_all_area(request) -> Response:
+    areas = AreaComercial.objects.all()
+    serializer = AreaComercialSerializer(areas, many=True)  # Serialize os dados
+    return Response(serializer.data)
 
 def list_all_areas(request, unidade_id=None):
     user_id = request.user.id
