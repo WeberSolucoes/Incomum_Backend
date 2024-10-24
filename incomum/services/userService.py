@@ -14,29 +14,34 @@ def login(request):
             data = json.loads(request.body)
             email = data.get('loginemail')
             password = data.get('loginsenha')
+
             if request.user.is_authenticated:
                 return JsonResponse({'success': True, 'message': 'Você já está logado!'})
 
             print(f"Tentando autenticar: email={email}, senha={password}")
 
-            # Tente autenticar o usuário usando email
-            usuario = authenticate(request, username=email, password=password)
-
-            if usuario is None:
-                print("Autenticação falhou. O usuário pode não existir ou a senha pode estar incorreta.")
+            # Buscar o usuário pelo email
+            try:
+                usuario = User.objects.get(email=email)
+            except User.DoesNotExist:
+                print("Usuário não encontrado.")
                 return JsonResponse({'success': False, 'error_message': 'Email ou senha inválidos.'}, status=400)
 
-            print(f"Usuário autenticado: {usuario}")
+            # Verificar se a senha está correta
+            if not usuario.check_password(password):
+                print("Senha incorreta.")
+                return JsonResponse({'success': False, 'error_message': 'Email ou senha inválidos.'}, status=400)
 
+            # Autenticar e logar o usuário
             if usuario.is_active:
                 auth_login(request, usuario)
 
-                # Gerar tokens
+                # Gerar tokens JWT
                 refresh = RefreshToken.for_user(usuario)
                 return JsonResponse({
                     'success': True,
-                    'access': str(refresh.access_token),  # Retorne o token de acesso
-                    'refresh': str(refresh),  # Opcionalmente, você pode retornar o token de atualização
+                    'access': str(refresh.access_token),  # Retorna o token de acesso
+                    'refresh': str(refresh),  # Opcionalmente, retorne o token de atualização
                     'message': 'Login efetuado com sucesso!'
                 })
             else:
@@ -48,6 +53,7 @@ def login(request):
             return JsonResponse({'success': False, 'error_message': str(e)}, status=500)
 
     return JsonResponse({'success': False, 'error_message': 'Método não permitido'}, status=405)
+
 
 
 
