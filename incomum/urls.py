@@ -2,7 +2,7 @@ from django import views
 from django.urls import path
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
-from .views import areaComercialViews, lojaViews, usuarioComercialViews, relatorioViews, relatorioViews,agenciaViews,vendedorViews,userViews
+from .views import areaComercialViews, lojaViews, usuarioComercialViews, relatorioViews, relatorioViews,agenciaViews,vendedorViews,userViews,agenteViews
 urlpatterns = [
 
     path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
@@ -57,4 +57,10 @@ urlpatterns = [
 
     #Usuario
     path('usuario/login/', userViews.login),
+    #Agente
+    path('agente/create/', agenteViews.create),
+    path('agente/find-byid/<int:id>/', agenteViews.find_by_id),
+    path('agente/update/<int:id>/',agenteViews.update),
+    path('agente/delete/<int:id>/', agenteViews.delete),
+    path('agente/list-all/', agenteViews.list_all),
 ]
