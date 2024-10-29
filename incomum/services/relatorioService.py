@@ -194,7 +194,7 @@ def list_all_byfilter(request):
 def list_all_lojas_byfilter(request):
     # Filtrar as lojas conforme necessário, por exemplo:
     # lojas = Loja.objects.filter(user=request.user)
-    lojas = Loja.objects.all()  # Obtém todas as lojas
+    lojas = Loja.objects.all().order_by('loj_descricao')  # Obtém todas as lojas
 
     # Serializa as lojas
     serializer = LojaSerializer(lojas, many=True)
