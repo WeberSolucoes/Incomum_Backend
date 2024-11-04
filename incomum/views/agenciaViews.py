@@ -68,3 +68,27 @@ def update(request, id):
 @permission_classes([IsAuthenticated])
 def delete(request, id):
     return agenciaService.delete(id)
+
+
+@swagger_auto_schema(
+    methods=['post'],
+    responses={200: AgenciaSerializer},
+    tags=['Agencia']
+)
+@api_view(['POST'])
+@authentication_classes([JWTAuthentication])
+@permission_classes([AllowAny]) 
+def update_logo(request, id):
+    return agenciaService.update_logo(request, id)
+
+
+@swagger_auto_schema(
+    methods=['get'],
+    responses={200: AgenciaSerializer},
+    tags=['Agencia']
+)
+@api_view(['GET'])
+@authentication_classes([JWTAuthentication])
+@permission_classes([AllowAny]) 
+def get_agencia_imagem(request, id):
+    return agenciaService.get_agencia_imagem(request, id)
