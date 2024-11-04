@@ -68,3 +68,16 @@ def update(request, id):
 @permission_classes([IsAuthenticated])
 def delete(request, id):
     return agenteService.delete(id)
+
+
+@swagger_auto_schema(
+    methods=['get'],
+    responses={200: AgenteSerializer},
+    tags=['Agencia']
+)
+@api_view(['GET'])
+@authentication_classes([JWTAuthentication])
+@permission_classes([AllowAny]) 
+@permission_classes([IsAuthenticated])
+def get_agentes_por_agencia (request, age_codigo):
+    return agenteService.get_agentes_por_agencia(request,age_codigo)
