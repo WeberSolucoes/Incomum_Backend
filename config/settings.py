@@ -191,3 +191,9 @@ STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static'),]
 #SECURE_SSL_REDIRECT = True
 #SESSION_COOKIE_SECURE = True
 #CSRF_COOKIE_SECURE = True
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+# Configuração adicional para uploads (opcional)
+FILE_UPLOAD_MAX_MEMORY_SIZE = 1048576  # 1 MB
