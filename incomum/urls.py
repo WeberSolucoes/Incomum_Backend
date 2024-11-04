@@ -2,7 +2,10 @@ from django import views
 from django.urls import path
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
-from .views import areaComercialViews, lojaViews, usuarioComercialViews, relatorioViews, relatorioViews,agenciaViews,vendedorViews,userViews,agenteViews
+from django.conf import settings
+from django.conf.urls.static import static
+
+from .views import areaComercialViews, lojaViews, usuarioComercialViews, relatorioViews, relatorioViews,agenciaViews,vendedorViews,userViews,faturamento,agenteViews
 urlpatterns = [
 
     path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
@@ -29,6 +32,8 @@ urlpatterns = [
     path('agencia/update/<int:id>/', agenciaViews.update),
     path('agencia/delete/<int:id>/', agenciaViews.delete),
     path('agencia/list-all/', agenciaViews.list_all),
+    path('agencia/upload/<int:id>/', agenciaViews.update_logo),
+    path('agencia/<int:id>/imagem/', agenciaViews.get_agencia_imagem),
 
     #UsuarioComercial
     path('usuario_comercial/find-byid/<int:id>/', usuarioComercialViews.find_by_id),
@@ -45,9 +50,8 @@ urlpatterns = [
     path('relatorio/vendedor-by-user/', relatorioViews.list_all_vendedores_byfilter),
     path('relatorio/agencia-by-user/', relatorioViews.list_all_agencias_byfilter),
     path('relatorio/download-relatorio/', relatorioViews.create_excel_byfilter),
-    path('relatorio/list-all-areas/', relatorioViews.list_all_areas),
-    path('relatorio/list-all-area/', relatorioViews.list_all_area),
-
+    path('relatorio/list-all-areas/', relatorioViews.list_all_areas),  # Quando não há unidade selecionada
+    path('relatorio/list-all-areas/<int:unidade_id>/', relatorioViews.list_all_areas),
     #Vendedor
     path('vendedor/find-byid/<int:id>/', vendedorViews.find_by_id),
     path('vendedor/create/', vendedorViews.create),
@@ -57,10 +61,13 @@ urlpatterns = [
 
     #Usuario
     path('usuario/login/', userViews.login),
+
     #Agente
     path('agente/create/', agenteViews.create),
     path('agente/find-byid/<int:id>/', agenteViews.find_by_id),
     path('agente/update/<int:id>/',agenteViews.update),
     path('agente/delete/<int:id>/', agenteViews.delete),
     path('agente/list-all/', agenteViews.list_all),
-]
+    path('agente/<int:age_codigo>/', agenteViews.get_agentes_por_agencia),
+    
+]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
