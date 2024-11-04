@@ -38,3 +38,45 @@ def delete(id):
 
     agencia.delete()
     return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+def update_logo(request, id):
+    try:
+        agencia = Agencia.objects.get(age_codigo=id)
+    except Agencia.DoesNotExist:
+        return Response({"error": "Agência não encontrada"}, status=status.HTTP_404_NOT_FOUND)
+
+    if 'age_imagem' in request.FILES:
+        file = request.FILES['age_imagem']
+
+        try:
+            # Lê os dados da imagem como binário
+            file_data = file.read()
+
+            # Atualiza o campo age_imagem (tipo bytea)
+            agencia.age_imagem = file_data
+            agencia.save()
+
+            return Response({"message": "Imagem atualizada com sucesso"}, status=status.HTTP_200_OK)
+
+        except Exception as e:
+            print("Erro ao atualizar a imagem:", traceback.format_exc())
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    else:
+        return Response({"error": "Nenhuma imagem foi fornecida"}, status=status.HTTP_400_BAD_REQUEST)
+
+def get_agencia_imagem(request, id):
+    agencia = get_object_or_404(Agencia, age_codigo=id)
+
+    if not agencia.age_imagem:
+        raise Http404("Imagem não encontrada")
+
+    try:
+        image_data = base64.b64encode(agencia.age_imagem).decode('utf-8')
+        response_data = {"image": f"data:image/png;base64,{image_data}"}
+        print(response_data)  # Adicione este log
+        return JsonResponse(response_data, status=200)
+    except Exception as e:
+        print("Erro ao retornar a imagem:", e)
+        raise Http404("Erro ao retornar a imagem.")
