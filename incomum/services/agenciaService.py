@@ -24,6 +24,7 @@ def update(request, id):
     except Agencia.DoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND)
 
+    print("Dados recebidos para atualização:", request.data)
     serializer = AgenciaSerializer(agencia, data=request.data)
     if serializer.is_valid():
         serializer.save()
