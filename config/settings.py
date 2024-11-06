@@ -26,8 +26,10 @@ SECRET_KEY = 'django-insecure-b1wluvtg+9au^^cq&cwhk-qjd%62xhx0*bw@gzq6w$o#9a)%#-
 DEBUG = True
 
 ALLOWED_HOSTS = ['*']
-# CORS_ALLOWED_ORIGINS = ['*']
-CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOWED_ORIGINS = [
+    'http://3.143.213.18:8080',  # URL do seu frontend (em desenvolvimento ou produção)
+    'http://18.118.35.25:8443',  # URL do seu backend (se for acessado diretamente do navegador)
+]
 
 # Application definition
 
