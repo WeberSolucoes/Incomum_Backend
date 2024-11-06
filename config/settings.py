@@ -30,6 +30,11 @@ CORS_ALLOWED_ORIGINS = [
     'http://3.143.213.18:8080',  # URL do seu frontend (em desenvolvimento ou produção)
     'http://18.118.35.25:8443',  # URL do seu backend (se for acessado diretamente do navegador)
 ]
+CORS_ALLOW_HEADERS = (
+    'Authorization',
+    'Content-Type',
+    # outros cabeçalhos se necessário
+)
 
 # Application definition
 
