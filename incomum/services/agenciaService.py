@@ -3,6 +3,13 @@ from rest_framework.response import Response
 from ..models import Agencia
 from ..serializers.agenciaSerializer import AgenciaSerializer
 
+from django.db import connection
+import traceback
+
+import base64
+from django.http import JsonResponse, Http404
+from django.shortcuts import get_object_or_404
+
 def find_by_id(id):
     entity = Agencia.objects.get(age_codigo=id)
     return Response(AgenciaSerializer(entity).data, status=status.HTTP_200_OK)
