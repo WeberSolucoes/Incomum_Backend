@@ -5,7 +5,7 @@ from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from django.conf import settings
 from django.conf.urls.static import static
 
-from .views import areaComercialViews, lojaViews, usuarioComercialViews, relatorioViews, relatorioViews,agenciaViews,vendedorViews,userViews,agenteViews
+from .views import areaComercialViews, lojaViews, usuarioComercialViews, relatorioViews, relatorioViews,agenciaViews,vendedorViews,userViews,agenteViews,aeroportoViews
 urlpatterns = [
 
     path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
@@ -69,5 +69,12 @@ urlpatterns = [
     path('agente/delete/<int:id>/', agenteViews.delete),
     path('agente/list-all/', agenteViews.list_all),
     path('agente/<int:age_codigo>/', agenteViews.get_agentes_por_agencia),
+
+    #Aeroporto
+    path('aeroporto/create/', aeroportoViews.create),
+    path('aeroporto/find-byid/<int:id>/', aeroportoViews.find_by_id),
+    path('aeroporto/update/<int:id>/',aeroportoViews.update),
+    path('aeroporto/delete/<int:id>/', aeroportoViews.delete),
+    path('aeroporto/list-all/', aeroportoViews.list_all),
     
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
