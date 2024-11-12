@@ -2,6 +2,7 @@ from rest_framework.decorators import api_view, authentication_classes, permissi
 from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework.permissions import AllowAny
+from rest_framework.response import Response
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
 
@@ -77,3 +78,18 @@ def delete(request, id):
 @permission_classes([IsAuthenticated])
 def list_all(request):
     return lojaService.list_all()
+
+
+
+@swagger_auto_schema(
+    methods=['get'],
+    responses={200: LojaSerializer(many=True)},
+    tags=['Loja']
+)
+@api_view(['GET'])
+@authentication_classes([JWTAuthentication])
+@permission_classes([AllowAny]) 
+@permission_classes([IsAuthenticated])
+def find_vinculadas(request, aco_codigo):
+    lojas_vinculadas = lojaService.find_vinculadas(aco_codigo)
+    return Response(LojaSerializer(lojas_vinculadas, many=True).data)
