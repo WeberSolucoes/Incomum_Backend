@@ -8,4 +8,3 @@ class AreaComercialCreateSerializer(serializers.Serializer):
     aco_descricao = serializers.CharField(max_length=50)
     aco_situacao = serializers.IntegerField()
     aco_rateio = serializers.IntegerField()
-    id_loja = serializers.IntegerField()
