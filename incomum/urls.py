@@ -142,7 +142,13 @@ urlpatterns = [
     path('classe/delete/<int:id>/', classeViews.delete),
     path('classe/list-all/', classeViews.list_all),
 
-    
+    #Acomodação
+    path('acomodacao/find-byid/<int:id>/', tipoAcomodacaoViews.find_by_id),
+    path('acomodacao/create/', tipoAcomodacaoViews.create),
+    path('acomodacao/update/<int:id>/', tipoAcomodacaoViews.update),
+    path('acomodacao/delete/<int:id>/', tipoAcomodacaoViews.delete),
+    path('acomodacao/list-all/', tipoAcomodacaoViews.list_all),
 
+    
     
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
