@@ -5,7 +5,7 @@ from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from django.conf import settings
 from django.conf.urls.static import static
 
-from .views import areaComercialViews, lojaViews, usuarioComercialViews, relatorioViews, relatorioViews,agenciaViews,vendedorViews,userViews,agenteViews,aeroportoViews,paisViews,cidadeViews,moedaViews,cepViews,departamentoViews,companhiaViews,assinaturaViews,classeViews,tipoAcomodacaoViews,tipoPadraoViews
+from .views import areaComercialViews, lojaViews, usuarioComercialViews, relatorioViews, relatorioViews,agenciaViews,vendedorViews,userViews,agenteViews,aeroportoViews,paisViews,cidadeViews,moedaViews,cepViews,departamentoViews,companhiaViews,assinaturaViews,classeViews,tipoAcomodacaoViews,tipoPadraoViews,tipoRegimeViews
 urlpatterns = [
 
     path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
@@ -155,6 +155,13 @@ urlpatterns = [
     path('padrao/update/<int:id>/', tipoPadraoViews.update),
     path('padrao/delete/<int:id>/', tipoPadraoViews.delete),
     path('padrao/list-all/', tipoPadraoViews.list_all),
+
+    #Regime
+    path('regime/find-byid/<int:id>/', tipoRegimeViews.find_by_id),
+    path('regime/create/', tipoRegimeViews.create),
+    path('regime/update/<int:id>/', tipoRegimeViews.update),
+    path('regime/delete/<int:id>/', tipoRegimeViews.delete),
+    path('regime/list-all/', tipoRegimeViews.list_all),
 
     
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
