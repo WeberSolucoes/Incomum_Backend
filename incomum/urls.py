@@ -5,7 +5,7 @@ from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from django.conf import settings
 from django.conf.urls.static import static
 
-from .views import areaComercialViews, lojaViews, usuarioComercialViews, relatorioViews, relatorioViews,agenciaViews,vendedorViews,userViews,agenteViews,aeroportoViews,paisViews,cidadeViews,moedaViews,cepViews,departamentoViews,companhiaViews,assinaturaViews,classeViews,tipoAcomodacaoViews
+from .views import areaComercialViews, lojaViews, usuarioComercialViews, relatorioViews, relatorioViews,agenciaViews,vendedorViews,userViews,agenteViews,aeroportoViews,paisViews,cidadeViews,moedaViews,cepViews,departamentoViews,companhiaViews,assinaturaViews,classeViews,tipoAcomodacaoViews,,tipoPadraoViews
 urlpatterns = [
 
     path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
@@ -149,6 +149,12 @@ urlpatterns = [
     path('acomodacao/delete/<int:id>/', tipoAcomodacaoViews.delete),
     path('acomodacao/list-all/', tipoAcomodacaoViews.list_all),
 
-    
+    #Padrão
+    path('padrao/find-byid/<int:id>/', tipoPadraoViews.find_by_id),
+    path('padrao/create/', tipoPadraoViews.create),
+    path('padrao/update/<int:id>/', tipoPadraoViews.update),
+    path('padrao/delete/<int:id>/', tipoPadraoViews.delete),
+    path('padrao/list-all/', tipoPadraoViews.list_all),
+
     
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
