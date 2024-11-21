@@ -15,7 +15,7 @@ def create(request) -> Response:
     serializer = AreaComercialCreateSerializer(data=request.data)
     if serializer.is_valid():
         try:
-            loja: Loja = Loja.objects.get(loj_codigo = serializer.validated_data['id_loja'])
+            loja: Loja = Loja.objects.get(loj_codigo = serializer.validated_data['loj_codigo'])
 
             area: AreaComercial = AreaComercial()
             area.aco_descricao = serializer.validated_data['aco_descricao']
@@ -41,7 +41,7 @@ def update(request, id) -> Response:
     if serializer.is_valid():
         try:
             area: AreaComercial = AreaComercial.objects.get(aco_codigo = id)
-            loja: Loja = Loja.objects.get(loj_codigo = serializer.validated_data['id_loja'])
+            loja: Loja = Loja.objects.get(loj_codigo = serializer.validated_data['loj_codigo'])
 
             area.aco_descricao = serializer.validated_data['aco_descricao'] if serializer.validated_data['aco_descricao'] else area.aco_descricao
             area.aco_rateio = serializer.validated_data['aco_rateio'] if serializer.validated_data['aco_rateio'] else area.aco_rateio
