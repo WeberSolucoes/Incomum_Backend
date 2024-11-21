@@ -1,6 +1,7 @@
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.authentication import JWTAuthentication
+from rest_framework.permissions import AllowAny
 
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
@@ -15,6 +16,7 @@ from ..services import areaComercialService
         tags=['AreaComercial'])
 @api_view(['GET'])
 @authentication_classes([JWTAuthentication])
+@permission_classes([AllowAny]) 
 @permission_classes([IsAuthenticated])
 def find_by_id(request, id):
     return areaComercialService.findById(id)
@@ -26,6 +28,7 @@ def find_by_id(request, id):
         tags=['AreaComercial'])
 @api_view(['POST'])
 @authentication_classes([JWTAuthentication])
+@permission_classes([AllowAny]) 
 @permission_classes([IsAuthenticated])
 def create(request):
     return areaComercialService.create(request)
@@ -36,6 +39,7 @@ def create(request):
         tags=['AreaComercial'])
 @api_view(['GET'])
 @authentication_classes([JWTAuthentication])
+@permission_classes([AllowAny]) 
 @permission_classes([IsAuthenticated])
 def find_by_loja(request, id):
     return areaComercialService.findByLoja(id)
@@ -47,6 +51,7 @@ def find_by_loja(request, id):
         tags=['AreaComercial'])
 @api_view(['PUT'])
 @authentication_classes([JWTAuthentication])
+@permission_classes([AllowAny]) 
 @permission_classes([IsAuthenticated])
 def update(request, id):
     return areaComercialService.update(request, id)
@@ -57,6 +62,7 @@ def update(request, id):
         tags=['AreaComercial'])
 @api_view(['DELETE'])
 @authentication_classes([JWTAuthentication])
+@permission_classes([AllowAny]) 
 @permission_classes([IsAuthenticated])
 def delete(request, id):
     return areaComercialService.delete(id)
@@ -67,6 +73,7 @@ def delete(request, id):
         tags=['AreaComercial'])
 @api_view(['GET'])
 @authentication_classes([JWTAuthentication])
+@permission_classes([AllowAny]) 
 @permission_classes([IsAuthenticated])
 def list_all(request):
     return areaComercialService.list_all()
