@@ -5,7 +5,7 @@ from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from django.conf import settings
 from django.conf.urls.static import static
 
-from .views import areaComercialViews, lojaViews, usuarioComercialViews, relatorioViews, relatorioViews,agenciaViews,vendedorViews,userViews,agenteViews,aeroportoViews,paisViews,cidadeViews,moedaViews,cepViews,departamentoViews,companhiaViews,assinaturaViews,classeViews,tipoAcomodacaoViews,tipoPadraoViews,tipoRegimeViews
+from .views import areaComercialViews, lojaViews, usuarioComercialViews, relatorioViews, relatorioViews,agenciaViews,vendedorViews,userViews,agenteViews,aeroportoViews,paisViews,cidadeViews,moedaViews,cepViews,departamentoViews,companhiaViews,assinaturaViews,classeViews,tipoAcomodacaoViews,tipoPadraoViews,tipoRegimeViews,situacaoTuristicoViews,servicoTuristicoViews
 urlpatterns = [
 
     path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
@@ -162,6 +162,20 @@ urlpatterns = [
     path('regime/update/<int:id>/', tipoRegimeViews.update),
     path('regime/delete/<int:id>/', tipoRegimeViews.delete),
     path('regime/list-all/', tipoRegimeViews.list_all),
+
+    #Situação Turistico
+    path('situacaoturistico/find-byid/<int:id>/', situacaoTuristicoViews.find_by_id),
+    path('situacaoturistico/create/', situacaoTuristicoViews.create),
+    path('situacaoturistico/update/<int:id>/', situacaoTuristicoViews.update),
+    path('situacaoturistico/delete/<int:id>/', situacaoTuristicoViews.delete),
+    path('situacaoturistico/list-all/', situacaoTuristicoViews.list_all),
+
+    #Serviço Turistico
+    path('servicoturistico/find-byid/<int:id>/', servicoTuristicoViews.find_by_id),
+    path('servicoturistico/create/', servicoTuristicoViews.create),
+    path('servicoturistico/update/<int:id>/', servicoTuristicoViews.update),
+    path('servicoturistico/delete/<int:id>/', servicoTuristicoViews.delete),
+    path('servicoturistico/list-all/', servicoTuristicoViews.list_all),
 
     
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
