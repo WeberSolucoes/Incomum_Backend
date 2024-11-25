@@ -5,7 +5,7 @@ from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from django.conf import settings
 from django.conf.urls.static import static
 
-from .views import areaComercialViews, lojaViews, usuarioComercialViews, relatorioViews, relatorioViews,agenciaViews,vendedorViews,userViews,agenteViews,aeroportoViews,paisViews,cidadeViews,moedaViews,cepViews,departamentoViews,companhiaViews,assinaturaViews,classeViews,tipoAcomodacaoViews,tipoPadraoViews,tipoRegimeViews,situacaoTuristicoViews,servicoTuristicoViews
+from .views import areaComercialViews, lojaViews, usuarioComercialViews, relatorioViews, relatorioViews,agenciaViews,vendedorViews,userViews,agenteViews,aeroportoViews,paisViews,cidadeViews,moedaViews,cepViews,departamentoViews,companhiaViews,assinaturaViews,classeViews,tipoAcomodacaoViews,tipoPadraoViews,tipoRegimeViews,situacaoTuristicoViews,servicoTuristicoViews,bandeiraViews
 urlpatterns = [
 
     path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
@@ -176,6 +176,14 @@ urlpatterns = [
     path('servicoturistico/update/<int:id>/', servicoTuristicoViews.update),
     path('servicoturistico/delete/<int:id>/', servicoTuristicoViews.delete),
     path('servicoturistico/list-all/', servicoTuristicoViews.list_all),
+
+    #Bandeira
+    path('bandeira/find-byid/<int:id>/', bandeiraViews.find_by_id),
+    path('bandeira/create/', bandeiraViews.create),
+    path('bandeira/update/<int:id>/', bandeiraViews.update),
+    path('bandeira/delete/<int:id>/', bandeiraViews.delete),
+    path('bandeira/list-all/', bandeiraViews.list_all),
+
 
     
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
