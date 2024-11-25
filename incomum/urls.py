@@ -5,7 +5,7 @@ from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from django.conf import settings
 from django.conf.urls.static import static
 
-from .views import areaComercialViews, lojaViews, usuarioComercialViews, relatorioViews, relatorioViews,agenciaViews,vendedorViews,userViews,agenteViews,aeroportoViews,paisViews,cidadeViews,moedaViews,cepViews,departamentoViews,companhiaViews,assinaturaViews,classeViews,tipoAcomodacaoViews,tipoPadraoViews,tipoRegimeViews,situacaoTuristicoViews,servicoTuristicoViews,bandeiraViews
+from .views import areaComercialViews, lojaViews, usuarioComercialViews, relatorioViews, relatorioViews,agenciaViews,vendedorViews,userViews,agenteViews,aeroportoViews,paisViews,cidadeViews,moedaViews,cepViews,departamentoViews,companhiaViews,assinaturaViews,classeViews,tipoAcomodacaoViews,tipoPadraoViews,tipoRegimeViews,situacaoTuristicoViews,servicoTuristicoViews,bandeiraViews,formaPagamentoViews
 urlpatterns = [
 
     path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
@@ -183,6 +183,14 @@ urlpatterns = [
     path('bandeira/update/<int:id>/', bandeiraViews.update),
     path('bandeira/delete/<int:id>/', bandeiraViews.delete),
     path('bandeira/list-all/', bandeiraViews.list_all),
+
+    #Forma De Pagamento
+    path('formapagamento/find-byid/<int:id>/', formaPagamentoViews.find_by_id),
+    path('formapagamento/create/', formaPagamentoViews.create),
+    path('formapagamento/update/<int:id>/', formaPagamentoViews.update),
+    path('formapagamento/delete/<int:id>/', formaPagamentoViews.delete),
+    path('formapagamento/list-all/', formaPagamentoViews.list_all),
+
 
 
     
