@@ -5,7 +5,7 @@ from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from django.conf import settings
 from django.conf.urls.static import static
 
-from .views import areaComercialViews, lojaViews, usuarioComercialViews, relatorioViews, relatorioViews,agenciaViews,vendedorViews,userViews,agenteViews,aeroportoViews,paisViews,cidadeViews,moedaViews,cepViews,departamentoViews,companhiaViews,assinaturaViews,classeViews,tipoAcomodacaoViews,tipoPadraoViews,tipoRegimeViews,situacaoTuristicoViews,servicoTuristicoViews,bandeiraViews,formaPagamentoViews
+from .views import areaComercialViews, lojaViews, usuarioComercialViews, relatorioViews, relatorioViews,agenciaViews,vendedorViews,userViews,agenteViews,aeroportoViews,paisViews,cidadeViews,moedaViews,cepViews,departamentoViews,companhiaViews,assinaturaViews,classeViews,tipoAcomodacaoViews,tipoPadraoViews,tipoRegimeViews,situacaoTuristicoViews,servicoTuristicoViews,bandeiraViews,formaPagamentoViews,parceiroViews,parceiroContatoViews 
 urlpatterns = [
 
     path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
@@ -190,6 +190,20 @@ urlpatterns = [
     path('formapagamento/update/<int:id>/', formaPagamentoViews.update),
     path('formapagamento/delete/<int:id>/', formaPagamentoViews.delete),
     path('formapagamento/list-all/', formaPagamentoViews.list_all),
+
+    #Parceiro
+    path('parceiro/find-byid/<int:id>/', parceiroViews.find_by_id),
+    path('parceiro/create/', parceiroViews.create),
+    path('parceiro/update/<int:id>/', parceiroViews.update),
+    path('parceiro/delete/<int:id>/', parceiroViews.delete),
+    path('parceiro/list-all/', parceiroViews.list_all),
+
+    #Parceiro
+    path('parceirocontato/find-byid/<int:id>/', parceiroContatoViews.find_by_id),
+    path('parceirocontato/create/', parceiroContatoViews.create),
+    path('parceirocontato/update/<int:id>/', parceiroContatoViews.update),
+    path('parceirocontato/delete/<int:id>/', parceiroContatoViews.delete),
+    path('parceirocontato/list-all/', parceiroContatoViews.list_all),
 
 
 
