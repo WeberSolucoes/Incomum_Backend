@@ -3,7 +3,7 @@ from django.db import models
 from incomum.models.parceiro import Parceiro
 
 class ParceiroContato(models.Model):
-    pco_codigo = models.IntegerField(primary_key=True)
+    pco_codigo = models.AutoField(primary_key=True)
     par_codigo = models.IntegerField()
     pco_descricao = models.CharField(max_length=255,null=True, blank=True)
     pco_observacao = models.CharField(max_length=255,null=True, blank=True)
