@@ -205,6 +205,14 @@ urlpatterns = [
     path('parceirocontato/delete/<int:id>/', parceiroContatoViews.delete),
     path('parceirocontato/list-all/', parceiroContatoViews.list_all),
 
+    #Banco
+    path('banco/find-byid/<int:id>/', bancoViews.find_by_id),
+    path('banco/create/', bancoViews.create),
+    path('banco/update/<int:id>/', bancoViews.update),
+    path('banco/delete/<int:id>/', bancoViews.delete),
+    path('banco/list-all/', bancoViews.list_all),
+
+
 
 
     
