@@ -368,6 +368,13 @@ def create_excel_byfilter(request) -> Response:
         """, [user_id])
         user_areas = [row[0] for row in cursor.fetchall()]
 
+    # Validando se o usuário está vinculado a alguma área comercial
+    if not user_areas:
+        return Response(
+            {"message": "Usuário não possui áreas comerciais vinculadas."},
+            status=status.HTTP_403_FORBIDDEN
+        )
+
     # Validando as datas
     try:
         data_consulta_dt = datetime.strptime(data_consulta, "%Y-%m-%d")
@@ -381,16 +388,13 @@ def create_excel_byfilter(request) -> Response:
     # Construindo a query base
     query = """
         SELECT fim_tipo, tur_numerovenda, tur_codigo, fim_valorliquido, fim_data, fim_markup, fim_valorinc, fim_valorincajustado, aco_descricao, age_descricao, ven_descricao, fat_valorvendabruta
-        FROM faturamentosimplificado 
+        FROM faturamentosimplificado
         WHERE fim_data BETWEEN %s AND %s 
+          AND aco_codigo IN %s
     """
-    params = [data_consulta_dt, data_consulta_final_dt]
+    params = [data_consulta_dt, data_consulta_final_dt, tuple(user_areas)]
 
-    # Adicionando filtros à consulta com base nas seleções
-    if user_areas:
-        query += " AND aco_codigo IN %s"
-        params.append(tuple(user_areas))
-
+    # Adicionando filtros adicionais à consulta
     if unidade_selecionada:
         query += " AND loj_codigo = %s"
         params.append(unidade_selecionada)
@@ -414,30 +418,36 @@ def create_excel_byfilter(request) -> Response:
         cursor.execute(query, params)
         resultados = cursor.fetchall()
 
-
     # Formatando os resultados com o serializer
-    resultados_formatados = [RelatorioSerializer({
-        'fim_tipo': resultado[0],
-        'tur_numerovenda': resultado[1],
-        'tur_codigo': resultado[2],
-        'fim_valorliquido': resultado[3],
-        'fim_data': resultado[4],
-        'fim_markup': resultado[5],
-        'fim_valorinc': resultado[6],
-        'fim_valorincajustado': resultado[7],
-        'aco_descricao': resultado[8],
-        'age_descricao': resultado[9],
-        'ven_descricao': resultado[10],
-        'fat_valorvendabruta': resultado[11],
-    }).data for resultado in resultados]
+    resultados_formatados = [
+        RelatorioSerializer({
+            'fim_tipo': resultado[0],
+            'tur_numerovenda': resultado[1],
+            'tur_codigo': resultado[2],
+            'fim_valorliquido': resultado[3],
+            'fim_data': resultado[4],
+            'fim_markup': resultado[5],
+            'fim_valorinc': resultado[6],
+            'fim_valorincajustado': resultado[7],
+            'aco_descricao': resultado[8],
+            'age_descricao': resultado[9],
+            'ven_descricao': resultado[10],
+            'fat_valorvendabruta': resultado[11],
+        }).data
+        for resultado in resultados
+    ]
 
-    # Chamar a função para processar os dados e gerar o Excel
+    # Gerando o Excel
     excel_data = process_data_chunk(resultados_formatados)
 
-    # Retornar o Excel como resposta (pode ser modificado conforme necessário)
-    response = HttpResponse(excel_data, content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    # Retornando o Excel como resposta
+    response = HttpResponse(
+        excel_data, 
+        content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    )
     response['Content-Disposition'] = 'attachment; filename="relatorio.xlsx"'
     return response
+
 
 
 def process_data_chunk(data_chunk):
