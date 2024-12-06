@@ -34,6 +34,7 @@ CORS_ALLOWED_ORIGINS = [
     'http://18.118.35.25',
     'http://3.21.123.210:8080',
     'http://www.incoback.com.br',
+    'https://www.incoback.com.br',
 ]
 CORS_ALLOW_HEADERS = (
     'Authorization',
