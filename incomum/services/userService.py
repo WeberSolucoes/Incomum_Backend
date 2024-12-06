@@ -9,7 +9,7 @@ from ..serializers.usuarioComercialSerializer import *
 from ..models.usuario_areaComercial import UsuarioAreaComercial
 
 
-@csrf_exempt  # Considere usar um token CSRF em vez disso para produção
+@csrf_exempt
 def login(request):
     if request.method == 'POST':
         try:
@@ -17,6 +17,7 @@ def login(request):
             email = data.get('loginemail')
             password = data.get('loginsenha')
 
+            # Se o usuário já está autenticado
             if request.user.is_authenticated:
                 return JsonResponse({'success': True, 'message': 'Você já está logado!'})
 
@@ -34,16 +35,18 @@ def login(request):
                 print("Senha incorreta.")
                 return JsonResponse({'success': False, 'error_message': 'Email ou senha inválidos.'}, status=400)
 
-            # Autenticar e logar o usuário
+            # Verificar se o usuário está ativo
             if usuario.is_active:
-                auth_login(request, usuario)
+                auth_login(request, usuario)  # Login do usuário na sessão
 
-                # Gerar tokens JWT
+                # Gerar o token JWT
                 refresh = RefreshToken.for_user(usuario)
+
+                # Retornar o token de acesso e refresh
                 return JsonResponse({
                     'success': True,
-                    'access': str(refresh.access_token),  # Retorna o token de acesso
-                    'refresh': str(refresh),  # Opcionalmente, retorne o token de atualização
+                    'access': str(refresh.access_token),  # Token de acesso
+                    'refresh': str(refresh),  # Token de atualização (opcional)
                     'message': 'Login efetuado com sucesso!'
                 })
             else:
@@ -55,6 +58,7 @@ def login(request):
             return JsonResponse({'success': False, 'error_message': str(e)}, status=500)
 
     return JsonResponse({'success': False, 'error_message': 'Método não permitido'}, status=405)
+
 
 
 
