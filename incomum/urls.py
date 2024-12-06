@@ -70,6 +70,7 @@ urlpatterns = [
 
     #Usuario
     path('usuario/login/', userViews.login),
+    path('usuario/permission/', userViews.user_permissions_view),
 
     #Agente
     path('agente/create/', agenteViews.create),
