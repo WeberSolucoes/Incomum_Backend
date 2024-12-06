@@ -414,7 +414,6 @@ def create_excel_byfilter(request) -> Response:
         cursor.execute(query, params)
         resultados = cursor.fetchall()
 
-    print(resultados)
 
     # Formatando os resultados com o serializer
     resultados_formatados = [RelatorioSerializer({
