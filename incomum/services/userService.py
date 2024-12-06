@@ -5,6 +5,8 @@ from django.views.decorators.csrf import csrf_exempt
 import json
 from django.contrib.auth.models import User
 from rest_framework_simplejwt.tokens import RefreshToken  # Importação necessária
+from ..serializers.usuarioComercialSerializer import *
+from ..models.usuario_areaComercial import UsuarioAreaComercial
 
 
 @csrf_exempt  # Considere usar um token CSRF em vez disso para produção
@@ -63,3 +65,12 @@ def verificar_autenticacao(request):
 # Caso o usuário não esteja autenticado, retorne um erro 403
 def verificar_autenticacao_nao_login(request):
     return JsonResponse({'authenticated': False}, status=403)
+
+def user_permissions_view(request):
+    usuario_logado = request.user.id  # Pega o usuário logado
+
+    # Verifica se o usuário logado existe na tabela UsuarioAreaComercial
+    usuario_comercial = UsuarioAreaComercial.objects.filter(usr_codigo=usuario_logado).exists()
+    
+    # Retorna um valor booleano indicando se o usuário tem vínculo com área comercial
+    return JsonResponse({'usuario_comercial': usuario_comercial})
