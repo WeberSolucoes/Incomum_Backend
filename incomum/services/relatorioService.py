@@ -367,6 +367,8 @@ def create_excel_byfilter(request) -> Response:
             WHERE uac.id = %s
         """, [user_id])
         user_areas = [row[0] for row in cursor.fetchall()]
+        print(user_areas)
+        print(user_id)
 
     # Validando se o usuário está vinculado a alguma área comercial
     if not user_areas:
