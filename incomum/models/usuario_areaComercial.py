@@ -16,9 +16,9 @@ class AreaComercial2(models.Model):
         managed = False  # Isso impede que Django tente criar ou modificar a tabela
 
 class UsuarioAreaComercial(models.Model):
-    usuario = models.ForeignKey(Usuario, on_delete=models.CASCADE)
-    area_comercial = models.ForeignKey(AreaComercial2, on_delete=models.CASCADE)
+    usr_codigo = models.IntegerField(primary_key=True)
+    aco_codigo = models.IntegerField()
 
     class Meta:
-        unique_together = ('usuario', 'area_comercial')  # Você pode manter isso se necessário
+        db_table = 'usuariocomercial'
         managed = False  # Isso impede que Django tente criar ou modificar a tabela
