@@ -14,7 +14,18 @@ from rest_framework.permissions import AllowAny
 )
 @api_view(['POST'])
 @permission_classes([AllowAny])  # Permissão aberta para todos
-@authentication_classes([JWTAuthentication])  # Usando JWT como autenticação
 def login(request):
     # Passa o request para o serviço de login
     return userService.login(request)
+
+@swagger_auto_schema(
+    methods=['get'],  # A requisição será via GET
+    request_body=UserSerializer,  # Validação do corpo da requisição com o serializer
+    responses={200: UserSerializer},  # A resposta segue o formato do serializer
+    tags=['Usuario']  # Tag para documentação no Swagger
+)
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])  # Permite apenas usuários autenticado
+def user_permissions_view(request):
+    # Passa o request para o serviço de login
+    return userService.user_permissions_view(request)
