@@ -11,7 +11,7 @@ from django.http import JsonResponse, Http404
 from django.shortcuts import get_object_or_404
 
 def find_by_id(id):
-    entity = Aeroporto.objects.get(age_codigo=id)
+    entity = Aeroporto.objects.get(aer_codigo=id)
     return Response(AeroportoSerializer(entity).data, status=status.HTTP_200_OK)
 
 def list_all():
@@ -27,7 +27,7 @@ def create(request):
 
 def update(request, id):
     try:
-        agencia: Agencia = Aeroporto.objects.get(age_codigo=id)
+        agencia: Agencia = Aeroporto.objects.get(aer_codigo=id)
     except Agencia.DoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND)
 
@@ -40,7 +40,7 @@ def update(request, id):
 
 def delete(id):
     try:
-        agencia: Agencia = Aeroporto.objects.get(age_codigo=id)
+        agencia: Agencia = Aeroporto.objects.get(aer_codigo=id)
     except Agencia.DoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND)
 
