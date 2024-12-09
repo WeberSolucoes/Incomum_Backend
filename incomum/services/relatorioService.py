@@ -370,12 +370,10 @@ def create_excel_byfilter(request) -> Response:
         print(user_areas)
         print(user_id)
 
-    # Validando se o usuário está vinculado a alguma área comercial
+    # Caso o usuário não tenha áreas comerciais vinculadas, ele pode consultar todas as áreas
     if not user_areas:
-        return Response(
-            {"message": "Usuário não possui áreas comerciais vinculadas."},
-            status=status.HTTP_403_FORBIDDEN
-        )
+        print("Usuário não vinculado a nenhuma área comercial. Permitindo consulta completa.")
+        user_areas = []  # Fazendo a consulta sem restrição de áreas
 
     # Validando as datas
     try:
@@ -391,17 +389,21 @@ def create_excel_byfilter(request) -> Response:
     query = """
         SELECT fim_tipo, tur_numerovenda, tur_codigo, fim_valorliquido, fim_data, fim_markup, fim_valorinc, fim_valorincajustado, aco_descricao, age_descricao, ven_descricao, fat_valorvendabruta
         FROM faturamentosimplificado
-        WHERE fim_data BETWEEN %s AND %s 
-          AND aco_codigo IN %s
+        WHERE fim_data BETWEEN %s AND %s
     """
-    params = [data_consulta_dt, data_consulta_final_dt, tuple(user_areas)]
+    params = [data_consulta_dt, data_consulta_final_dt]
+
+    # Caso o usuário tenha áreas comerciais vinculadas, filtra pelas áreas vinculadas
+    if user_areas:
+        query += " AND aco_codigo IN %s"
+        params.append(tuple(user_areas))
 
     # Adicionando filtros adicionais à consulta
     if unidade_selecionada:
         query += " AND loj_codigo = %s"
         params.append(unidade_selecionada)
 
-    if areas_selecionadas and len(areas_selecionadas) > 0:
+    if areas_selecionadas:
         query += " AND aco_codigo IN %s"
         params.append(tuple(areas_selecionadas))
 
@@ -449,6 +451,7 @@ def create_excel_byfilter(request) -> Response:
     )
     response['Content-Disposition'] = 'attachment; filename="relatorio.xlsx"'
     return response
+
 
 
 
