@@ -1,7 +1,7 @@
 from rest_framework import status
 from rest_framework.response import Response
-from ..models import aeroporto
-from ..serializers.aeroportoSerializer import AeroportoSerializer
+from ..models import *
+from ..serializers.aeroportoSerializer import *
 
 from django.db import connection
 import traceback
