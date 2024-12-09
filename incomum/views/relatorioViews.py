@@ -82,8 +82,9 @@ def list_all_areas(request, unidade_id=None):
         tags=['Relatorio'])
 @api_view(['GET'])
 @authentication_classes([JWTAuthentication])
-@permission_classes([IsAuthenticated])  # Exige autenticação
+@permission_classes([IsAuthenticated])
 def create_excel_byfilter(request):
+    print(f"Headers: {request.headers}")  # Log para verificar cabeçalhos
     return relatorioService.create_excel_byfilter(request)
 
 @swagger_auto_schema(
