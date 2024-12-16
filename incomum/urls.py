@@ -214,6 +214,35 @@ urlpatterns = [
     path('banco/list-all/', bancoViews.list_all),
 
 
+    #Despesas
+    path('despesas/find-byid/<int:id>/', despesasViews.find_by_id),
+    path('despesas/create/', despesasViews.create),
+    path('despesas/update/<int:id>/', despesasViews.update),
+    path('despesas/delete/<int:id>/', despesasViews.delete),
+    path('despesas/list-all/', despesasViews.list_all),
+
+    #Centro De Custo
+    path('centrocusto/find-byid/<int:id>/', centroCustoViews.find_by_id),
+    path('centrocusto/create/', centroCustoViews.create),
+    path('centrocusto/update/<int:id>/', centroCustoViews.update),
+    path('centrocusto/delete/<int:id>/', centroCustoViews.delete),
+    path('centrocusto/list-all/', centroCustoViews.list_all),
+
+    #Subgrupo
+    path('subgrupo/find-byid/<int:id>/', subgrupoViews.find_by_id),
+    path('subgrupo/create/', subgrupoViews.create),
+    path('subgrupo/update/<int:id>/', subgrupoViews.update),
+    path('subgrupo/delete/<int:id>/', subgrupoViews.delete),
+    path('subgrupo/list-all/', subgrupoViews.list_all),
+
+    #Despesas Geral
+    path('despesasgeral/find-byid/<int:id>/', despesasGeralViews.find_by_id),
+    path('despesasgeral/create/', despesasGeralViews.create),
+    path('despesasgeral/update/<int:id>/', despesasGeralViews.update),
+    path('despesasgeral/delete/<int:id>/', despesasGeralViews.delete),
+    path('despesasgeral/list-all/', despesasGeralViews.list_all),
+
+
 
 
     
