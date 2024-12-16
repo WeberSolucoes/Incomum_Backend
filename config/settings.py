@@ -36,6 +36,7 @@ CORS_ALLOWED_ORIGINS = [
     'http://www.incoback.com.br',
     'https://www.incoback.com.br',
     'https://incoback.com.br',
+    'https://api.incoback.com.br',
 ]
 
 CORS_ALLOW_HEADERS = (
