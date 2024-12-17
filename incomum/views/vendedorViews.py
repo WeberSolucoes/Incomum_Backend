@@ -14,7 +14,6 @@ from rest_framework.permissions import AllowAny
 )
 @api_view(['POST'])
 @authentication_classes([JWTAuthentication])
-@permission_classes([AllowAny])
 @permission_classes([IsAuthenticated])
 def create(request):
     return vendedorService.create(request)
@@ -26,7 +25,6 @@ def create(request):
 )
 @api_view(['GET'])
 @authentication_classes([JWTAuthentication])
-@permission_classes([AllowAny])
 @permission_classes([IsAuthenticated])
 def find_by_id(request,id):
     return vendedorService.find_by_id(id)
@@ -50,7 +48,6 @@ def list_all(request):
 )
 @api_view(['PUT'])
 @authentication_classes([JWTAuthentication])
-@permission_classes([AllowAny])
 @permission_classes([IsAuthenticated])
 def update(request, id):
     return vendedorService.update(request, id)
@@ -62,7 +59,6 @@ def update(request, id):
 )
 @api_view(['DELETE'])
 @authentication_classes([JWTAuthentication])
-@permission_classes([AllowAny])
 @permission_classes([IsAuthenticated])
 def delete(request, id):
     return vendedorService.delete(id)
