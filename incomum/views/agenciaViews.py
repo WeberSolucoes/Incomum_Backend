@@ -13,8 +13,7 @@ from rest_framework.permissions import AllowAny
     responses={200: AgenciaSerializer},
     tags=['Agencia']
 )
-@api_view(['POST'])
-@permission_classes([AllowAny]) 
+@api_view(['POST']) 
 @authentication_classes([JWTAuthentication])
 @permission_classes([IsAuthenticated])
 def create(request):
@@ -27,7 +26,6 @@ def create(request):
 )
 @api_view(['GET'])
 @authentication_classes([JWTAuthentication])
-@permission_classes([AllowAny]) 
 @permission_classes([IsAuthenticated])
 def find_by_id(request,id):
     return agenciaService.find_by_id(id)
@@ -39,7 +37,6 @@ def find_by_id(request,id):
 )
 @api_view(['GET'])
 @authentication_classes([JWTAuthentication])
-@permission_classes([AllowAny])
 @permission_classes([IsAuthenticated])
 def list_all(request):
     return agenciaService.list_all()
@@ -51,8 +48,7 @@ def list_all(request):
     tags=['Agencia']
 )
 @api_view(['PUT'])
-@authentication_classes([JWTAuthentication])
-@permission_classes([AllowAny]) 
+@authentication_classes([JWTAuthentication]) 
 @permission_classes([IsAuthenticated])
 def update(request, id):
     return agenciaService.update(request, id)
@@ -64,7 +60,6 @@ def update(request, id):
 )
 @api_view(['DELETE'])
 @authentication_classes([JWTAuthentication])
-@permission_classes([AllowAny]) 
 @permission_classes([IsAuthenticated])
 def delete(request, id):
     return agenciaService.delete(id)
@@ -77,7 +72,7 @@ def delete(request, id):
 )
 @api_view(['POST'])
 @authentication_classes([JWTAuthentication])
-@permission_classes([AllowAny]) 
+@permission_classes([IsAuthenticated])
 def update_logo(request, id):
     return agenciaService.update_logo(request, id)
 
@@ -89,6 +84,6 @@ def update_logo(request, id):
 )
 @api_view(['GET'])
 @authentication_classes([JWTAuthentication])
-@permission_classes([AllowAny]) 
+@permission_classes([IsAuthenticated])
 def get_agencia_imagem(request, id):
     return agenciaService.get_agencia_imagem(request, id)
