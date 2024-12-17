@@ -16,7 +16,6 @@ from ..services import lojaService
         tags=['Loja'])
 @api_view(['GET'])
 @authentication_classes([JWTAuthentication])
-@permission_classes([AllowAny]) 
 @permission_classes([IsAuthenticated])
 def find_by_id(request, id):
     return lojaService.findById(id)
@@ -28,7 +27,6 @@ def find_by_id(request, id):
         tags=['Loja'])
 @api_view(['POST'])
 @authentication_classes([JWTAuthentication])
-@permission_classes([AllowAny]) 
 @permission_classes([IsAuthenticated])
 def create(request):
     return lojaService.create(request)
@@ -39,7 +37,6 @@ def create(request):
         tags=['Loja'])
 @api_view(['GET'])
 @authentication_classes([JWTAuthentication])
-@permission_classes([AllowAny]) 
 @permission_classes([IsAuthenticated])
 def find_by_loja(request, id):
     return lojaService.findByLoja(id)
@@ -51,7 +48,6 @@ def find_by_loja(request, id):
         tags=['Loja'])
 @api_view(['PUT'])
 @authentication_classes([JWTAuthentication])
-@permission_classes([AllowAny]) 
 @permission_classes([IsAuthenticated])
 def update(request, id):
     return lojaService.update(request, id)
@@ -62,7 +58,6 @@ def update(request, id):
         tags=['Loja'])
 @api_view(['DELETE'])
 @authentication_classes([JWTAuthentication])
-@permission_classes([AllowAny]) 
 @permission_classes([IsAuthenticated])
 def delete(request, id):
     return lojaService.delete(id)
@@ -74,7 +69,6 @@ def delete(request, id):
 @api_view(['GET'])
 
 @authentication_classes([JWTAuthentication])
-@permission_classes([AllowAny])
 @permission_classes([IsAuthenticated])
 def list_all(request):
     return lojaService.list_all()
@@ -88,7 +82,6 @@ def list_all(request):
 )
 @api_view(['GET'])
 @authentication_classes([JWTAuthentication])
-@permission_classes([AllowAny]) 
 @permission_classes([IsAuthenticated])
 def find_vinculadas(request, aco_codigo):
     lojas_vinculadas = lojaService.find_vinculadas(aco_codigo)
