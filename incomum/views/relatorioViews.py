@@ -18,7 +18,7 @@ from rest_framework.permissions import AllowAny
         tags=['Relatorio'])
 @api_view(['GET'])
 @authentication_classes([JWTAuthentication])
-@permission_classes([AllowAny])
+@permission_classes([IsAuthenticated])
 def list_all_byfilter(request):
     return relatorioService.list_all_byfilter(request)
 
@@ -27,7 +27,7 @@ def list_all_byfilter(request):
         tags=['Relatorio'])
 @api_view(['GET'])
 @authentication_classes([JWTAuthentication])
-@permission_classes([AllowAny])
+@permission_classes([IsAuthenticated])
 def total_byfilter(request):
     return relatorioService.total_byfilter(request)
 
@@ -36,7 +36,7 @@ def total_byfilter(request):
         tags=['Relatorio'])
 @api_view(['GET'])
 @authentication_classes([JWTAuthentication])
-@permission_classes([AllowAny])
+@permission_classes([IsAuthenticated])
 def list_all_lojas_byfilter(request):
     return relatorioService.list_all_lojas_byfilter(request)
 
@@ -45,7 +45,7 @@ def list_all_lojas_byfilter(request):
         tags=['Relatorio'])
 @api_view(['GET'])
 @authentication_classes([JWTAuthentication])
-@permission_classes([AllowAny])
+@permission_classes([IsAuthenticated])
 def list_all_areas_byfilter(request):
     return relatorioService.list_all_areas_byfilter(request)
 
@@ -54,7 +54,7 @@ def list_all_areas_byfilter(request):
         tags=['Relatorio'])
 @api_view(['GET'])
 @authentication_classes([JWTAuthentication])
-@permission_classes([AllowAny])
+@permission_classes([IsAuthenticated])
 def list_all_vendedores_byfilter(request):
     return relatorioService.list_all_vendedores_byfilter(request)
 
@@ -63,7 +63,7 @@ def list_all_vendedores_byfilter(request):
         tags=['Relatorio'])
 @api_view(['GET'])
 @authentication_classes([JWTAuthentication])
-@permission_classes([AllowAny])
+@permission_classes([IsAuthenticated])
 def list_all_agencias_byfilter(request):
     return relatorioService.list_all_agencias_byfilter(request)
 
@@ -72,7 +72,7 @@ def list_all_agencias_byfilter(request):
         tags=['Relatorio'])
 @api_view(['GET'])
 @authentication_classes([JWTAuthentication])
-@permission_classes([AllowAny])
+@permission_classes([IsAuthenticated])
 def list_all_areas(request, unidade_id=None):
     # Chama a função de serviço passando a unidade_id (ou None)
     return relatorioService.list_all_areas(request, unidade_id)
@@ -82,7 +82,7 @@ def list_all_areas(request, unidade_id=None):
     tags=['Relatorio'])
 @api_view(['GET'])
 @authentication_classes([JWTAuthentication])
-@permission_classes([AllowAny])
+@permission_classes([IsAuthenticated])
 def create_excel_byfilter(request):
     print(f"Headers: {request.headers}")  # Log para verificar cabeçalhos
     return relatorioService.create_excel_byfilter(request)
@@ -92,6 +92,6 @@ def create_excel_byfilter(request):
         tags=['Relatorio'])
 @api_view(['GET'])
 @authentication_classes([JWTAuthentication])
-@permission_classes([AllowAny])
+@permission_classes([IsAuthenticated])
 def list_all_area(request):
     return relatorioService.list_all_area(request)
