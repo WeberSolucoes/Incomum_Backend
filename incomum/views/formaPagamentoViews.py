@@ -15,7 +15,6 @@ from ..services import formaPagamentoService
         tags=['Loja'])
 @api_view(['GET'])
 @authentication_classes([JWTAuthentication])
-@permission_classes([AllowAny]) 
 @permission_classes([IsAuthenticated])
 def find_by_id(request, id):
     return formaPagamentoService.findById(id)
@@ -27,7 +26,6 @@ def find_by_id(request, id):
         tags=['Loja'])
 @api_view(['POST'])
 @authentication_classes([JWTAuthentication])
-@permission_classes([AllowAny]) 
 @permission_classes([IsAuthenticated])
 def create(request):
     return formaPagamentoService.create(request)
@@ -38,7 +36,6 @@ def create(request):
         tags=['Loja'])
 @api_view(['GET'])
 @authentication_classes([JWTAuthentication])
-@permission_classes([AllowAny]) 
 @permission_classes([IsAuthenticated])
 def find_by_loja(request, id):
     return formaPagamentoService.findByLoja(id)
@@ -50,7 +47,6 @@ def find_by_loja(request, id):
         tags=['Loja'])
 @api_view(['PUT'])
 @authentication_classes([JWTAuthentication])
-@permission_classes([AllowAny]) 
 @permission_classes([IsAuthenticated])
 def update(request, id):
     return formaPagamentoService.update(request, id)
@@ -61,7 +57,6 @@ def update(request, id):
         tags=['Loja'])
 @api_view(['DELETE'])
 @authentication_classes([JWTAuthentication])
-@permission_classes([AllowAny]) 
 @permission_classes([IsAuthenticated])
 def delete(request, id):
     return formaPagamentoService.delete(id)
@@ -73,7 +68,6 @@ def delete(request, id):
 @api_view(['GET'])
 
 @authentication_classes([JWTAuthentication])
-@permission_classes([AllowAny])
 @permission_classes([IsAuthenticated])
 def list_all(request):
     return formaPagamentoService.list_all()
