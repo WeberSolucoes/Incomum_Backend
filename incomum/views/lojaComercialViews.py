@@ -14,7 +14,6 @@ from ..services import lojaComercialService
         responses={200: LojaComercialSerializer},
         tags=['LojaComercial'])
 @api_view(['GET'])
-@permission_classes([AllowAny]) 
 @authentication_classes([JWTAuthentication])
 @permission_classes([IsAuthenticated])
 def find_by_id(request, id):
@@ -26,7 +25,6 @@ def find_by_id(request, id):
         responses={201: LojaComercialSerializer},
         tags=['AreaComercial'])
 @api_view(['POST'])
-@permission_classes([AllowAny]) 
 @authentication_classes([JWTAuthentication])
 @permission_classes([IsAuthenticated])
 def create(request):
@@ -37,7 +35,6 @@ def create(request):
         responses={200: LojaComercialSerializer(many=True)},
         tags=['AreaComercial'])
 @api_view(['GET'])
-@permission_classes([AllowAny]) 
 @authentication_classes([JWTAuthentication])
 @permission_classes([IsAuthenticated])
 def find_by_loja(request, id):
@@ -49,7 +46,6 @@ def find_by_loja(request, id):
         responses={200: LojaComercialSerializer},
         tags=['AreaComercial'])
 @api_view(['PUT'])
-@permission_classes([AllowAny]) 
 @authentication_classes([JWTAuthentication])
 @permission_classes([IsAuthenticated])
 def update(request, id):
@@ -60,7 +56,6 @@ def update(request, id):
         responses={204: openapi.Response(description="No Content")},
         tags=['AreaComercial'])
 @api_view(['DELETE'])
-@permission_classes([AllowAny]) 
 @authentication_classes([JWTAuthentication])
 @permission_classes([IsAuthenticated])
 def delete(request, id):
@@ -71,7 +66,6 @@ def delete(request, id):
         responses={200: LojaComercialSerializer(many=True)},
         tags=['AreaComercial'])
 @api_view(['GET'])
-@permission_classes([AllowAny]) 
 @authentication_classes([JWTAuthentication])
 @permission_classes([IsAuthenticated])
 def list_all(request):
