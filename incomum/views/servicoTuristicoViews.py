@@ -15,7 +15,6 @@ from ..services import servicoTuristicoService
         tags=['Loja'])
 @api_view(['GET'])
 @authentication_classes([JWTAuthentication])
-@permission_classes([AllowAny]) 
 @permission_classes([IsAuthenticated])
 def find_by_id(request, id):
     return servicoTuristicoService.findById(id)
@@ -26,8 +25,7 @@ def find_by_id(request, id):
         responses={201: ServicoTuristicoSerializer},
         tags=['Loja'])
 @api_view(['POST'])
-@authentication_classes([JWTAuthentication])
-@permission_classes([AllowAny]) 
+@authentication_classes([JWTAuthentication]) 
 @permission_classes([IsAuthenticated])
 def create(request):
     return servicoTuristicoService.create(request)
@@ -38,7 +36,6 @@ def create(request):
         tags=['Loja'])
 @api_view(['GET'])
 @authentication_classes([JWTAuthentication])
-@permission_classes([AllowAny]) 
 @permission_classes([IsAuthenticated])
 def find_by_loja(request, id):
     return servicoTuristicoService.findByLoja(id)
@@ -49,8 +46,7 @@ def find_by_loja(request, id):
         responses={200: ServicoTuristicoSerializer},
         tags=['Loja'])
 @api_view(['PUT'])
-@authentication_classes([JWTAuthentication])
-@permission_classes([AllowAny]) 
+@authentication_classes([JWTAuthentication]) 
 @permission_classes([IsAuthenticated])
 def update(request, id):
     return servicoTuristicoService.update(request, id)
@@ -61,7 +57,6 @@ def update(request, id):
         tags=['Loja'])
 @api_view(['DELETE'])
 @authentication_classes([JWTAuthentication])
-@permission_classes([AllowAny]) 
 @permission_classes([IsAuthenticated])
 def delete(request, id):
     return servicoTuristicoService.delete(id)
@@ -73,7 +68,6 @@ def delete(request, id):
 @api_view(['GET'])
 
 @authentication_classes([JWTAuthentication])
-@permission_classes([AllowAny])
 @permission_classes([IsAuthenticated])
 def list_all(request):
     return servicoTuristicoService.list_all()
