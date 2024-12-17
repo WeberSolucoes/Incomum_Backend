@@ -14,7 +14,6 @@ from rest_framework.permissions import AllowAny
     tags=['Agencia']
 )
 @api_view(['POST'])
-@permission_classes([AllowAny]) 
 @authentication_classes([JWTAuthentication])
 @permission_classes([IsAuthenticated])
 def create(request):
@@ -26,8 +25,7 @@ def create(request):
     tags=['Agencia']
 )
 @api_view(['GET'])
-@authentication_classes([JWTAuthentication])
-@permission_classes([AllowAny]) 
+@authentication_classes([JWTAuthentication]) 
 @permission_classes([IsAuthenticated])
 def find_by_id(request,id):
     return agenteService.find_by_id(id)
@@ -39,7 +37,6 @@ def find_by_id(request,id):
 )
 @api_view(['GET'])
 @authentication_classes([JWTAuthentication])
-@permission_classes([AllowAny])
 @permission_classes([IsAuthenticated])
 def list_all(request):
     return agenteService.list_all()
@@ -51,8 +48,7 @@ def list_all(request):
     tags=['Agencia']
 )
 @api_view(['PUT'])
-@authentication_classes([JWTAuthentication])
-@permission_classes([AllowAny]) 
+@authentication_classes([JWTAuthentication]) 
 @permission_classes([IsAuthenticated])
 def update(request, id):
     return agenteService.update(request, id)
@@ -63,8 +59,7 @@ def update(request, id):
     tags=['Agencia']
 )
 @api_view(['DELETE'])
-@authentication_classes([JWTAuthentication])
-@permission_classes([AllowAny]) 
+@authentication_classes([JWTAuthentication]) 
 @permission_classes([IsAuthenticated])
 def delete(request, id):
     return agenteService.delete(id)
@@ -76,8 +71,7 @@ def delete(request, id):
     tags=['Agencia']
 )
 @api_view(['GET'])
-@authentication_classes([JWTAuthentication])
-@permission_classes([AllowAny]) 
+@authentication_classes([JWTAuthentication]) 
 @permission_classes([IsAuthenticated])
 def get_agentes_por_agencia (request, age_codigo):
     return agenteService.get_agentes_por_agencia(request,age_codigo)
