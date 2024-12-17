@@ -15,7 +15,6 @@ from ..services import assinaturaService
         tags=['Loja'])
 @api_view(['GET'])
 @authentication_classes([JWTAuthentication])
-@permission_classes([AllowAny]) 
 @permission_classes([IsAuthenticated])
 def find_by_id(request, id):
     return assinaturaService.findById(id)
@@ -27,7 +26,6 @@ def find_by_id(request, id):
         tags=['Loja'])
 @api_view(['POST'])
 @authentication_classes([JWTAuthentication])
-@permission_classes([AllowAny]) 
 @permission_classes([IsAuthenticated])
 def create(request):
     return assinaturaService.create(request)
@@ -37,8 +35,7 @@ def create(request):
         responses={200: AssinaturaSerializer(many=True)},
         tags=['Loja'])
 @api_view(['GET'])
-@authentication_classes([JWTAuthentication])
-@permission_classes([AllowAny]) 
+@authentication_classes([JWTAuthentication]) 
 @permission_classes([IsAuthenticated])
 def find_by_loja(request, id):
     return assinaturaService.findByLoja(id)
@@ -49,8 +46,7 @@ def find_by_loja(request, id):
         responses={200: AssinaturaSerializer},
         tags=['Loja'])
 @api_view(['PUT'])
-@authentication_classes([JWTAuthentication])
-@permission_classes([AllowAny]) 
+@authentication_classes([JWTAuthentication]) 
 @permission_classes([IsAuthenticated])
 def update(request, id):
     return assinaturaService.update(request, id)
@@ -60,8 +56,7 @@ def update(request, id):
         responses={204: openapi.Response(description="No Content")},
         tags=['Loja'])
 @api_view(['DELETE'])
-@authentication_classes([JWTAuthentication])
-@permission_classes([AllowAny]) 
+@authentication_classes([JWTAuthentication]) 
 @permission_classes([IsAuthenticated])
 def delete(request, id):
     return assinaturaService.delete(id)
@@ -73,7 +68,6 @@ def delete(request, id):
 @api_view(['GET'])
 
 @authentication_classes([JWTAuthentication])
-@permission_classes([AllowAny])
 @permission_classes([IsAuthenticated])
 def list_all(request):
     return assinaturaService.list_all()
