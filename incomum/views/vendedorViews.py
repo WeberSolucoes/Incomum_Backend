@@ -38,7 +38,6 @@ def find_by_id(request,id):
 )
 @api_view(['GET'])
 @authentication_classes([JWTAuthentication])
-@permission_classes([AllowAny])
 @permission_classes([IsAuthenticated])
 def list_all(request):
     return vendedorService.list_all()
