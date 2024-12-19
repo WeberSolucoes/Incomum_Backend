@@ -316,23 +316,25 @@ def list_all_agencias_byfilter(request) -> Response:
 
     with connection.cursor() as cursor:
         if area_comercial:
-            # Se uma área comercial foi selecionada, filtrar por ela
+            # Ajusta o formato da área comercial para uma tupla
+            area_comercial_tuple = tuple(area_comercial) if len(area_comercial) > 1 else (area_comercial[0],)
+            print(f'Filtro por área comercial: {area_comercial_tuple}')
             cursor.execute("""
                 SELECT age_codigo, age_descricao
                 FROM agencia
                 WHERE aco_codigo IN %s
-            """, [tuple(area_comercial)])
+            """, [area_comercial_tuple])
         else:
             # Se nenhuma área comercial foi selecionada, verificar user_aco_codigos
             if user_aco_codigos:
-                # Filtrar as agências associadas ao(s) aco_codigo do usuário
+                print(f'Filtro por ACO do usuário: {user_aco_codigos}')
                 cursor.execute("""
                     SELECT age_codigo, age_descricao
                     FROM agencia
                     WHERE aco_codigo IN %s
                 """, [tuple(user_aco_codigos)])
             else:
-                # Se não há aco_codigos para o usuário, puxar todos os registros
+                print('Nenhum filtro aplicado, retornando todos os registros.')
                 cursor.execute("""
                     SELECT age_codigo, age_descricao
                     FROM agencia
@@ -346,7 +348,10 @@ def list_all_agencias_byfilter(request) -> Response:
         for row in resultados
     ]
 
+    print(f'Resultados encontrados: {valores}')
+
     return Response({'valores': valores})
+
 
 
 def create_excel_byfilter(request) -> Response:
