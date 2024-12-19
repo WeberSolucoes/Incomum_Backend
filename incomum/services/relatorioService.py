@@ -359,7 +359,7 @@ def create_excel_byfilter(request) -> Response:
     data_consulta = request.GET.get('dataInicio')
     data_consulta_final = request.GET.get('dataFim')
     unidade_selecionada = request.GET.get('unidade')
-    areas_selecionadas = request.GET.getlist('area_comercial[]')  # Lista
+    areas_selecionadas = request.GET.getlist('area_comercial[]')  # Lista de áreas comerciais
     agencia_selecionada = request.GET.get('agencia')
     vendedor_selecionada = request.GET.get('vendedore')
 
@@ -387,7 +387,7 @@ def create_excel_byfilter(request) -> Response:
     query = """
         SELECT fim_tipo, tur_numerovenda, tur_codigo, fim_valorliquido, fim_data, fim_markup, fim_valorinc, fim_valorincajustado, aco_descricao, age_descricao, ven_descricao, fat_valorvendabruta
         FROM faturamentosimplificado 
-        WHERE fim_data BETWEEN %s AND %s 
+        WHERE fim_data BETWEEN %s AND %s
     """
     params = [data_consulta_dt, data_consulta_final_dt]
 
@@ -401,6 +401,7 @@ def create_excel_byfilter(request) -> Response:
         params.append(unidade_selecionada)
 
     if areas_selecionadas:
+        # Certifique-se de que estamos tratando `areas_selecionadas` como uma lista, mesmo que tenha apenas um item
         areas_tuple = tuple(areas_selecionadas) if len(areas_selecionadas) > 1 else (areas_selecionadas[0],)
         query += " AND aco_codigo IN %s"
         params.append(areas_tuple)
@@ -446,6 +447,7 @@ def create_excel_byfilter(request) -> Response:
     )
     response['Content-Disposition'] = 'attachment; filename="relatorio.xlsx"'
     return response
+
 
 
 
