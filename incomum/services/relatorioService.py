@@ -359,7 +359,7 @@ def create_excel_byfilter(request) -> Response:
     data_consulta = request.GET.get('dataInicio')
     data_consulta_final = request.GET.get('dataFim')
     unidade_selecionada = request.GET.get('unidade')
-    areas_selecionadas = request.GET.getlist('areaComercial')
+    areas_selecionadas = request.GET.getlist('areaComercial[]')
     agencia_selecionada = request.GET.get('agencia')
     vendedor_selecionada = request.GET.get('vendedor')
 
