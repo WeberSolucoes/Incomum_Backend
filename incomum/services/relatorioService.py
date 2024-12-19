@@ -358,12 +358,12 @@ def create_excel_byfilter(request) -> Response:
     user_id = request.user.id
     data_consulta = request.GET.get('dataInicio')
     data_consulta_final = request.GET.get('dataFim')
-    unidade_selecionada = request.GET.get('unidades')
-    areas_selecionadas = request.GET.getlist('areasComerciais')
-    agencia_selecionada = request.GET.get('agencias')
-    vendedor_selecionada = request.GET.get('vendedores')
+    unidade_selecionada = request.GET.get('unidade')
+    areas_selecionadas = request.GET.getlist('area_comercial[]')  # Lista
+    agencia_selecionada = request.GET.get('agencia')
+    vendedor_selecionada = request.GET.get('vendedore')
 
-    # Consultando as áreas do usuário
+    # Consultando as áreas comerciais do usuário
     with connection.cursor() as cursor:
         cursor.execute("""
             SELECT ac.aco_codigo
@@ -372,13 +372,6 @@ def create_excel_byfilter(request) -> Response:
             WHERE uac.id = %s
         """, [user_id])
         user_areas = [row[0] for row in cursor.fetchall()]
-        print(user_areas)
-        print(user_id)
-
-    # Caso o usuário não tenha áreas comerciais vinculadas, ele pode consultar todas as áreas
-    if not user_areas:
-        print("Usuário não vinculado a nenhuma área comercial. Permitindo consulta completa.")
-        user_areas = []  # Fazendo a consulta sem restrição de áreas
 
     # Validando as datas
     try:
@@ -393,24 +386,24 @@ def create_excel_byfilter(request) -> Response:
     # Construindo a query base
     query = """
         SELECT fim_tipo, tur_numerovenda, tur_codigo, fim_valorliquido, fim_data, fim_markup, fim_valorinc, fim_valorincajustado, aco_descricao, age_descricao, ven_descricao, fat_valorvendabruta
-        FROM faturamentosimplificado
-        WHERE fim_data BETWEEN %s AND %s
+        FROM faturamentosimplificado 
+        WHERE fim_data BETWEEN %s AND %s 
     """
     params = [data_consulta_dt, data_consulta_final_dt]
 
-    # Caso o usuário tenha áreas comerciais vinculadas, filtra pelas áreas vinculadas
+    # Adicionando filtros à consulta com base nas seleções
     if user_areas:
         query += " AND aco_codigo IN %s"
         params.append(tuple(user_areas))
 
-    # Adicionando filtros adicionais à consulta
     if unidade_selecionada:
         query += " AND loj_codigo = %s"
         params.append(unidade_selecionada)
 
     if areas_selecionadas:
+        areas_tuple = tuple(areas_selecionadas) if len(areas_selecionadas) > 1 else (areas_selecionadas[0],)
         query += " AND aco_codigo IN %s"
-        params.append(tuple(areas_selecionadas))
+        params.append(areas_tuple)
 
     if agencia_selecionada:
         query += " AND age_codigo = %s"
@@ -428,34 +421,32 @@ def create_excel_byfilter(request) -> Response:
         resultados = cursor.fetchall()
 
     # Formatando os resultados com o serializer
-    resultados_formatados = [
-        RelatorioSerializer({
-            'fim_tipo': resultado[0],
-            'tur_numerovenda': resultado[1],
-            'tur_codigo': resultado[2],
-            'fim_valorliquido': resultado[3],
-            'fim_data': resultado[4],
-            'fim_markup': resultado[5],
-            'fim_valorinc': resultado[6],
-            'fim_valorincajustado': resultado[7],
-            'aco_descricao': resultado[8],
-            'age_descricao': resultado[9],
-            'ven_descricao': resultado[10],
-            'fat_valorvendabruta': resultado[11],
-        }).data
-        for resultado in resultados
-    ]
+    resultados_formatados = [RelatorioSerializer({
+        'fim_tipo': resultado[0],
+        'tur_numerovenda': resultado[1],
+        'tur_codigo': resultado[2],
+        'fim_valorliquido': resultado[3],
+        'fim_data': resultado[4],
+        'fim_markup': resultado[5],
+        'fim_valorinc': resultado[6],
+        'fim_valorincajustado': resultado[7],
+        'aco_descricao': resultado[8],
+        'age_descricao': resultado[9],
+        'ven_descricao': resultado[10],
+        'fat_valorvendabruta': resultado[11],
+    }).data for resultado in resultados]
 
-    # Gerando o Excel
+    # Chamar a função para processar os dados e gerar o Excel
     excel_data = process_data_chunk(resultados_formatados)
 
-    # Retornando o Excel como resposta
+    # Retornar o Excel como resposta
     response = HttpResponse(
-        excel_data, 
+        excel_data,
         content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
     )
     response['Content-Disposition'] = 'attachment; filename="relatorio.xlsx"'
     return response
+
 
 
 
