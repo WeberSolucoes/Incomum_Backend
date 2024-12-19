@@ -358,12 +358,12 @@ def create_excel_byfilter(request) -> Response:
     user_id = request.user.id
     data_consulta = request.GET.get('dataInicio')
     data_consulta_final = request.GET.get('dataFim')
-    unidade_selecionada = request.GET.get('unidades')
-    areas_selecionadas = request.GET.getlist('areasComerciais')  # Lista
-    agencia_selecionada = request.GET.get('agencias')
-    vendedor_selecionada = request.GET.get('vendedores')
+    unidade_selecionada = request.GET.get('unidade')
+    areas_selecionadas = request.GET.getlist('area_comercial[]')
+    agencia_selecionada = request.GET.get('agencia')
+    vendedor_selecionada = request.GET.get('vendedore')
 
-    # Consultando as áreas comerciais do usuário
+    # Consultando as áreas do usuário
     with connection.cursor() as cursor:
         cursor.execute("""
             SELECT ac.aco_codigo
@@ -383,7 +383,6 @@ def create_excel_byfilter(request) -> Response:
             status=status.HTTP_400_BAD_REQUEST
         )
 
-    # Construindo a query base
     query = """
         SELECT fim_tipo, tur_numerovenda, tur_codigo, fim_valorliquido, fim_data, fim_markup, fim_valorinc, fim_valorincajustado, aco_descricao, age_descricao, ven_descricao, fat_valorvendabruta
         FROM faturamentosimplificado 
@@ -391,7 +390,7 @@ def create_excel_byfilter(request) -> Response:
     """
     params = [data_consulta_dt, data_consulta_final_dt]
 
-    # Adicionando filtros à consulta com base nas seleções
+    # Adicionando filtros conforme as seleções
     if user_areas:
         query += " AND aco_codigo IN %s"
         params.append(tuple(user_areas))
@@ -401,9 +400,8 @@ def create_excel_byfilter(request) -> Response:
         params.append(unidade_selecionada)
 
     if areas_selecionadas:
-        areas_tuple = tuple(areas_selecionadas) if len(areas_selecionadas) > 1 else (areas_selecionadas[0],)
         query += " AND aco_codigo IN %s"
-        params.append(areas_tuple)
+        params.append(tuple(areas_selecionadas))
 
     if agencia_selecionada:
         query += " AND age_codigo = %s"
@@ -439,6 +437,13 @@ def create_excel_byfilter(request) -> Response:
     # Chamar a função para processar os dados e gerar o Excel
     excel_data = process_data_chunk(resultados_formatados)
 
+    # Calcular os totais após os filtros aplicados
+    soma_totais = {
+        'total_valorinc': sum(item['fim_valorinc'] for item in resultados_formatados if item['fim_valorinc'] is not None),
+        'total_valorincajustado': sum(item['fim_valorincajustado'] for item in resultados_formatados if item['fim_valorincajustado'] is not None),
+        'total_valorliquido': sum(item['fim_valorliquido'] for item in resultados_formatados if item['fim_valorliquido'] is not None),
+    }
+
     # Retornar o Excel como resposta
     response = HttpResponse(
         excel_data,
@@ -446,8 +451,6 @@ def create_excel_byfilter(request) -> Response:
     )
     response['Content-Disposition'] = 'attachment; filename="relatorio.xlsx"'
     return response
-
-
 
 
 
