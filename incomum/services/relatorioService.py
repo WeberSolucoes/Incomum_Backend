@@ -9,7 +9,6 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.pagination import PageNumberPagination
 from django.contrib.auth.models import User
-from django.db.models import Sum
 from django.contrib.auth.decorators import login_required
 from incomum.serializers.vendedorSerializer import VendedorSerializer
 from incomum.serializers import agenciaSerializer
@@ -19,7 +18,7 @@ from incomum.serializers.areaComercialSerializer import AreaComercialSerializer
 from datetime import datetime
 from django.db import connection
 from django.core.paginator import Paginator
-
+from django.db.models import Subquery, OuterRef, Sum
 from ..models import *
 from ..serializers.relatorioSerializer import *
 
@@ -542,3 +541,89 @@ def list_all_areas(request, unidade_id=None):
         ]
 
     return Response({'associacoes': associacoes})
+
+
+
+def obter_dados_unidade(request):
+    # Parâmetros de filtro
+    loj_codigo_param = request.GET.get('loj_codigo')  # Unidade
+    date_start = request.GET.get('date_start')  # Data inicial
+    date_end = request.GET.get('date_end')      # Data final
+
+    # Consulta inicial
+    queryset = Relatorio.objects.all()
+
+    # Filtrar por intervalo de datas
+    if date_start:
+        start_date = parse_date(date_start)
+        if start_date:
+            queryset = queryset.filter(fim_data__gte=start_date)
+
+    if date_end:
+        end_date = parse_date(date_end)
+        if end_date:
+            queryset = queryset.filter(fim_data__lte=end_date)
+
+    # Filtrar por unidade
+    if loj_codigo_param and loj_codigo_param != "todos":
+        queryset = queryset.filter(loj_codigo=loj_codigo_param)
+
+    # Subquery para buscar o loj_descricao na tabela Loja
+    loj_descricao_subquery = Loja.objects.filter(loj_codigo=OuterRef('loj_codigo')).values('loj_descricao')[:1]
+
+    # Agrupar e somar os valores, adicionando a subquery como anotação
+    resultados = (
+        queryset
+        .annotate(loj_descricao=Subquery(loj_descricao_subquery))
+        .values('loj_descricao')
+        .annotate(soma_valor=Sum('fim_valorliquido'))
+        .order_by('-soma_valor')[:10]
+    )
+
+    # Formatar os dados para o gráfico
+    dados_grafico = {
+        'labels': [item['loj_descricao'] for item in resultados],
+        'data': [item['soma_valor'] for item in resultados],
+    }
+
+    return Response(dados_grafico)
+
+
+def obter_dados_agencia(request):
+    # Parâmetros de filtro
+    age_codigo_param = request.GET.getlist('age_codigo[]')  # Agência como lista
+    date_start = request.GET.get('date_start')  # Data inicial
+    date_end = request.GET.get('date_end')      # Data final
+
+    # Consulta inicial
+    queryset = Relatorio.objects.all()
+
+    # Filtrar por intervalo de datas
+    if date_start:
+        start_date = parse_date(date_start)
+        if start_date:
+            queryset = queryset.filter(fim_data__gte=start_date)
+
+    if date_end:
+        end_date = parse_date(date_end)
+        if end_date:
+            queryset = queryset.filter(fim_data__lte=end_date)
+
+    # Filtrar por agência
+    if age_codigo_param and "todos" not in age_codigo_param:
+        queryset = queryset.filter(age_codigo__in=age_codigo_param)
+
+    # Agrupar e somar os valores
+    resultados = (
+        queryset.values('age_codigo', 'age_descricao')
+        .annotate(soma_valor=Sum('fim_valorliquido'))
+        .order_by('-soma_valor')[:10]
+    )
+
+    # Formatar os dados para o gráfico
+    dados_grafico = {
+        'labels': [item['age_descricao'] for item in resultados],
+        'data': [item['soma_valor'] for item in resultados],
+    }
+
+    return Response(dados_grafico)
