@@ -61,6 +61,8 @@ urlpatterns = [
     path('relatorio/download-relatorio/', relatorioViews.create_excel_byfilter),
     path('relatorio/list-all-area/', relatorioViews.list_all_areas),  # Quando não há unidade selecionada
     path('relatorio/list-all-areas/<int:unidade_id>/', relatorioViews.list_all_areas),
+    path('relatorio/obter-dados-unidade/', relatorioViews.obter_dados_unidade),
+    path('relatorio/obter-dados-agencia/', relatorioViews.obter_dados_agencia),
     #Vendedor
     path('vendedor/find-byid/<int:id>/', vendedorViews.find_by_id),
     path('vendedor/create/', vendedorViews.create),
