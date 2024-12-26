@@ -95,3 +95,22 @@ def create_excel_byfilter(request):
 @permission_classes([IsAuthenticated])
 def list_all_area(request):
     return relatorioService.list_all_area(request)
+
+
+@swagger_auto_schema(
+        methods=['get'],
+        tags=['Relatorio'])
+@api_view(['GET'])
+@authentication_classes([JWTAuthentication])
+@permission_classes([AllowAny])
+def obter_dados_unidade(request):
+    return relatorioService.obter_dados_unidade(request)
+
+@swagger_auto_schema(
+        methods=['get'],
+        tags=['Relatorio'])
+@api_view(['GET'])
+@authentication_classes([JWTAuthentication])
+@permission_classes([AllowAny])
+def obter_dados_agencia(request):
+    return relatorioService.obter_dados_agencia(request)
