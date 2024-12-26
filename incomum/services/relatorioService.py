@@ -18,6 +18,7 @@ from incomum.serializers.areaComercialSerializer import AreaComercialSerializer
 from datetime import datetime
 from django.db import connection
 from django.core.paginator import Paginator
+from django.utils.dateparse import parse_date
 from django.db.models import Subquery, OuterRef, Sum
 from ..models import *
 from ..serializers.relatorioSerializer import *
