@@ -18,6 +18,8 @@ class Relatorio(models.Model):
     ven_descricao = models.CharField(max_length=40)
     age_descricao = models.CharField(max_length=40)
     fat_valorvendabruta = models.FloatField()
+    loj_codigo = models.IntegerField()
+    age_codigo = models.IntegerField()
 
 
 
