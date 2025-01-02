@@ -22,6 +22,7 @@ from django.utils.dateparse import parse_date
 from django.db.models import Subquery, OuterRef, Sum
 from ..models import *
 from ..serializers.relatorioSerializer import *
+from django.db.models.functions import Round
 
 
 def total_byfilter(request) -> Response:
@@ -557,7 +558,7 @@ def obter_dados_unidade(request):
         queryset
         .annotate(loj_descricao=Subquery(loj_descricao_subquery))
         .values('loj_descricao')
-        .annotate(soma_valor=Sum('fim_valorliquido'))
+        .annotate(soma_valor=Round(Sum('fim_valorliquido'), 2))
         .order_by('-soma_valor')[:10]
     )
 
@@ -597,7 +598,7 @@ def obter_dados_agencia(request):
     # Agrupar e somar os valores
     resultados = (
         queryset.values('age_codigo', 'age_descricao')
-        .annotate(soma_valor=Sum('fim_valorliquido'))
+        .annotate(soma_valor=Round(Sum('fim_valorliquido'), 2))
         .order_by('-soma_valor')[:10]
     )
 
