@@ -502,46 +502,26 @@ def list_all_area(request) -> Response:
 
 def list_all_areas(request, unidade_id=None):
     user_id = request.user.id
-    unidade_id = request.GET.get('unidade')
-    # Verificar áreas comerciais associadas ao usuário
+
     with connection.cursor() as cursor:
-        cursor.execute("""
-            SELECT ac.aco_codigo, a.aco_descricao
-            FROM usuariocomercial ac
-            INNER JOIN areacomercial a ON a.aco_codigo = ac.aco_codigo
-            WHERE ac.usr_codigo = %s
-        """, [user_id])
-        user_areas = cursor.fetchall()
+        if unidade_id:
+            cursor.execute("""
+                SELECT lc.aco_codigo, a.aco_descricao
+                FROM lojacomercial lc
+                INNER JOIN areacomercial a ON lc.aco_codigo = a.aco_codigo
+                WHERE lc.loj_codigo = %s ORDER BY aco_descricao
+            """, [unidade_id])
+        else:
+            cursor.execute("""
+                SELECT a.aco_codigo, a.aco_descricao
+                FROM areacomercial a ORDER BY aco_descricao
+            """)
 
-    if user_areas:
-        associacoes = [
-            {'aco_codigo': row[0], 'aco_descricao': row[1]}
-            for row in user_areas
-        ]
-    else:
-        # Se o usuário não tem áreas associadas, realizar a consulta com base na unidade
-        with connection.cursor() as cursor:
-            if unidade_id:
-                cursor.execute("""
-                    SELECT lc.aco_codigo, a.aco_descricao
-                    FROM lojacomercial lc
-                    INNER JOIN areacomercial a ON lc.aco_codigo = a.aco_codigo
-                    WHERE lc.loj_codigo = %s ORDER BY aco_descricao
-                """, [unidade_id])
-            else:
-                cursor.execute("""
-                    SELECT a.aco_codigo, a.aco_descricao
-                    FROM areacomercial a ORDER BY aco_descricao
-                """)
+        resultados = cursor.fetchall()
 
-            resultados = cursor.fetchall()
-
-        associacoes = [
-            {'aco_codigo': row[0], 'aco_descricao': row[1]}
-            for row in resultados
-        ]
-
+    associacoes = [{'aco_codigo': row[0], 'aco_descricao': row[1]} for row in resultados]
     return Response({'associacoes': associacoes})
+
 
 
 
