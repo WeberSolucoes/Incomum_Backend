@@ -475,10 +475,7 @@ def process_data_chunk(data_chunk):
     ]
     ws.append(headers)
 
-    for relatorio in data_chunk:
-        # Use .get() para evitar KeyError caso a chave não exista
-        fat_valorvendabruta = relatorio.get('fat_valorvendabruta', 0)
-        
+    for relatorio in data_chunk:        
         # Adiciona os valores
         row = [
             relatorio['fim_tipo'],
@@ -492,7 +489,7 @@ def process_data_chunk(data_chunk):
             relatorio['aco_descricao'],
             relatorio['age_descricao'],
             relatorio['ven_descricao'],
-            locale.currency(fat_valorvendabruta, grouping=True),  # Aqui usamos o valor tratado
+            locale.currency(relatorio['fat_valorvendabruta'], grouping=True),  # Aqui usamos o valor tratado
         ]
         ws.append(row)
 
