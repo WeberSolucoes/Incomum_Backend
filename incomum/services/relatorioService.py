@@ -488,13 +488,23 @@ def process_data_chunk(data_chunk):
             relatorio['aco_descricao'],
             relatorio['age_descricao'],
             relatorio['ven_descricao'],
-            locale.currency(relatorio['fat_valorvendabruta'], grouping=True),
+            format_currency(relatorio['fat_valorvendabruta']),
         ])
 
     buffer = io.BytesIO()
     wb.save(buffer)
     buffer.seek(0)
     return buffer.getvalue()
+
+
+def format_currency(value):
+    # Verifica se o valor é None ou se não é um número válido
+    if value is None:
+        return "R$ 0,00"  # Ou qualquer outro valor default
+    try:
+        return locale.currency(value, grouping=True)
+    except ValueError:
+        return "R$ 0,00"  # Valor default em caso de erro
 
 def list_all_area(request) -> Response:
     areas = AreaComercial.objects.all()
