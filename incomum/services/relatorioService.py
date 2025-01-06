@@ -488,7 +488,7 @@ def process_data_chunk(data_chunk):
             relatorio['aco_descricao'],
             relatorio['age_descricao'],
             relatorio['ven_descricao'],
-            format_currency(relatorio['fat_valorvendabruta']),
+            format_currency(relatorio.get('fat_valorvendabruta', None)),
         ])
 
     buffer = io.BytesIO()
