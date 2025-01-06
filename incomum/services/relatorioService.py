@@ -432,7 +432,7 @@ def create_excel_byfilter(request) -> Response:
         'aco_descricao': resultado[8],
         'age_descricao': resultado[9],
         'ven_descricao': resultado[10],
-        'fat_valorvendabruta': resultado[11],
+        'fat_valorvendabruta': resultado[11] if resultado[11] is not None else 0,
     }).data for resultado in resultados]
 
     # Chamar a função para processar os dados e gerar o Excel
