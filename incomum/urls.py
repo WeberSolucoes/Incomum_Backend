@@ -73,6 +73,8 @@ urlpatterns = [
     #Usuario
     path('usuario/login/', userViews.login),
     path('usuario/permission/', userViews.user_permissions_view),
+    path('usuario/recuperar-senha/', userViews.PasswordRequest),
+    path('usuario/redefinir-senha/<uid>/<token>/', userViews.PasswordReset),
 
     #Agente
     path('agente/create/', agenteViews.create),
