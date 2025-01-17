@@ -7,6 +7,7 @@ from django.contrib.auth.models import User
 from rest_framework_simplejwt.tokens import RefreshToken  # Importação necessária
 from ..serializers.usuarioComercialSerializer import *
 from ..models.usuario_areaComercial import UsuarioAreaComercial
+from django.utils.http import urlsafe_base64_decode
 
 
 @csrf_exempt
@@ -78,3 +79,57 @@ def user_permissions_view(request):
     
     # Retorna um valor booleano indicando se o usuário tem vínculo com área comercial
     return JsonResponse({'usuario_comercial': usuario_comercial})
+
+
+
+def PasswordRequest(request):
+    email = request.data.get('email')
+    if not email:
+        return Response({'error': 'Email é obrigatório.'}, status=status.HTTP_400_BAD_REQUEST)
+
+    user = get_object_or_404(User, email=email)
+    token = default_token_generator.make_token(user)
+    uid = urlsafe_base64_encode(force_bytes(user.pk))
+        
+    frontend_url = "http://localhost:5173/redefinir-senha"
+    reset_link = f"{frontend_url}/{uid}/{token}"
+
+
+        # Enviar o email
+    send_mail(
+        'Redefinição de Senha',
+        f'Olá, clique no link para redefinir sua senha: {reset_link}',
+        'kauan@webersolucoes.com.br',  # Email remetente deve ser igual ao EMAIL_HOST_USER
+        [email],
+        fail_silently=False,
+    )
+
+
+    return Response({'message': 'Email de recuperação enviado com sucesso.'}, status=status.HTTP_200_OK)
+
+
+def PasswordReset(request, uid, token):
+    # Aqui estamos recebendo o `uid` e `token` diretamente da URL
+    new_password = request.data.get('new_password')
+
+    # Verificar se o parâmetro de nova senha foi passado
+    if not new_password:
+        return Response({'error': 'Nova senha é obrigatória.'}, status=status.HTTP_400_BAD_REQUEST)
+
+    try:
+        # Decodificar o UID e buscar o usuário
+        uid = urlsafe_base64_decode(uid).decode('utf-8')
+        user = User.objects.get(pk=uid)  # Buscar o usuário pelo ID
+    except (User.DoesNotExist, ValueError, TypeError) as e:
+        return Response({'error': 'Usuário inválido.'}, status=status.HTTP_400_BAD_REQUEST)
+
+    # Validar o token
+    if not default_token_generator.check_token(user, token):
+        return Response({'error': 'Token inválido ou expirado.'}, status=status.HTTP_400_BAD_REQUEST)
+
+    # Atualizar a senha
+    user.set_password(new_password)
+    user.save()
+
+    return Response({'message': 'Senha redefinida com sucesso.'}, status=status.HTTP_200_OK)
+
