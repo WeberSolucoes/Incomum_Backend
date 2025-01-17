@@ -8,7 +8,7 @@ from rest_framework_simplejwt.tokens import RefreshToken  # Importação necess�
 from ..serializers.usuarioComercialSerializer import *
 from ..models.usuario_areaComercial import UsuarioAreaComercial
 from django.utils.http import urlsafe_base64_decode
-
+from django.shortcuts import get_object_or_404
 
 @csrf_exempt
 def login(request):
