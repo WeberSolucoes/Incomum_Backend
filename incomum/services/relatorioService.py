@@ -349,7 +349,6 @@ def list_all_agencias_byfilter(request) -> Response:
         for row in resultados
     ]
 
-    print(f'Resultados encontrados: {valores}')
 
     return Response({'valores': valores})
 
