@@ -98,7 +98,7 @@ def PasswordRequest(request):
     token = default_token_generator.make_token(user)
     uid = urlsafe_base64_encode(force_bytes(user.pk))
         
-    frontend_url = "http://localhost:5173/redefinir-senha"
+    frontend_url = "https://incoback.com.br/redefinir-senha"
     reset_link = f"{frontend_url}/{uid}/{token}"
 
 
