@@ -29,3 +29,31 @@ def login(request):
 def user_permissions_view(request):
     # Passa o request para o serviço de login
     return userService.user_permissions_view(request)
+
+
+@swagger_auto_schema(
+    methods=['post'],  # A requisição será via GET
+    request_body=UserSerializer,  # Validação do corpo da requisição com o serializer
+    responses={200: UserSerializer},  # A resposta segue o formato do serializer
+    tags=['Usuario']  # Tag para documentação no Swagger
+)
+@api_view(['POST'])
+@authentication_classes([JWTAuthentication])
+@permission_classes([AllowAny])
+def PasswordRequest(request):
+    # Passa o request para o serviço de login
+    return userService.PasswordRequest(request)
+
+
+@swagger_auto_schema(
+    methods=['post'],  # A requisição será via GET
+    request_body=UserSerializer,  # Validação do corpo da requisição com o serializer
+    responses={200: UserSerializer},  # A resposta segue o formato do serializer
+    tags=['Usuario']  # Tag para documentação no Swagger
+)
+@api_view(['POST'])
+@authentication_classes([JWTAuthentication])
+@permission_classes([AllowAny])
+def PasswordReset(request, uid, token):
+    # Passa o request para o serviço de login
+    return userService.PasswordReset(request, uid, token)
