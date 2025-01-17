@@ -15,6 +15,7 @@ from django.utils.encoding import force_bytes
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
+from django.utils.http import urlsafe_base64_decode
 
 @csrf_exempt
 def login(request):
