@@ -44,3 +44,29 @@ def list_all() -> Response:
     lojas = Cidade.objects.all()
     serializer = CidadeSerializer(lojas, many=True)
     return Response(serializer.data)
+
+
+from django.db import connection
+
+from django.db import connection
+
+def search_cidades(request):
+    query = request.GET.get('q', '')
+    print(f"Consultando por: {query}")
+    
+    if len(query) >= 3:
+        with connection.cursor() as cursor:
+            sql_query = """
+                SELECT cid_codigo, cid_descricao, cid_estado, reg_codigo, cid_pais, cid_sigla, pai_codigo
+                FROM cidade
+                WHERE cid_descricao LIKE %s
+            """
+            print(f"Executando SQL: {sql_query} com parâmetro {f'%{query}%'}")
+            cursor.execute(sql_query, [f'%{query}%'])
+            cidades = cursor.fetchall()
+            print(f"Resultados da consulta: {cidades}")
+            
+            cidade_list = [{'label': cidade[1], 'value': cidade[0]} for cidade in cidades]
+            return Response(cidade_list, status=status.HTTP_200_OK)
+    else:
+        return Response([], status=status.HTTP_200_OK)
