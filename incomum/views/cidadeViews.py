@@ -71,3 +71,17 @@ def delete(request, id):
 @permission_classes([IsAuthenticated])
 def list_all(request):
     return cidadeService.list_all()
+
+
+@swagger_auto_schema(
+        methods=['get'],
+        responses={200: CidadeSerializer(many=True)},
+        tags=['Loja'])
+@api_view(['GET'])
+
+@authentication_classes([JWTAuthentication])
+@permission_classes([AllowAny])
+@permission_classes([IsAuthenticated])
+def search_cidades(request):
+    return cidadeService.search_cidades(request)
+
