@@ -104,6 +104,7 @@ urlpatterns = [
     path('cidade/update/<int:id>/', cidadeViews.update),
     path('cidade/delete/<int:id>/', cidadeViews.delete),
     path('cidade/list-all/', cidadeViews.list_all),
+    path('cidade/search/', cidadeViews.search_cidades),
 
     #Moeda
     path('moeda/find-byid/<int:id>/', moedaViews.find_by_id),
