@@ -360,7 +360,7 @@ def create_excel_byfilter(request) -> Response:
     data_consulta_final = request.GET.get('dataFim')
     unidade_selecionada = request.GET.get('unidade')
     areas_selecionadas = request.GET.getlist('areaComercial[]')
-    agencia_selecionada = request.GET.get('agencia')
+    agencia_selecionada = request.GET.getlist('agencia[]')
     vendedor_selecionada = request.GET.get('vendedor')
 
     # Consultando as áreas do usuário
@@ -405,7 +405,7 @@ def create_excel_byfilter(request) -> Response:
 
     if agencia_selecionada:
         query += " AND age_codigo = %s"
-        params.append(agencia_selecionada)
+        params.append(tuple((agencia_selecionada))
 
     if vendedor_selecionada:
         query += " AND ven_codigo = %s"
