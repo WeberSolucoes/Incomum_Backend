@@ -20,6 +20,7 @@ class Relatorio(models.Model):
     fat_valorvendabruta = models.FloatField(null=True)
     loj_codigo = models.IntegerField()
     age_codigo = models.IntegerField()
+    aco_codigo = models.IntegerField()
 
 
 
