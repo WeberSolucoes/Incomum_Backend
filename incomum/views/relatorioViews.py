@@ -114,3 +114,13 @@ def obter_dados_unidade(request):
 @permission_classes([AllowAny])
 def obter_dados_agencia(request):
     return relatorioService.obter_dados_agencia(request)
+
+
+@swagger_auto_schema(
+        methods=['post'],
+        tags=['Relatorio'])
+@api_view(['POST'])
+@authentication_classes([JWTAuthentication])
+@permission_classes([AllowAny])
+def obter_dados_area_comercial(request):
+    return relatorioService.obter_dados_area_comercial(request)
