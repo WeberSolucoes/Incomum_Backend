@@ -63,6 +63,7 @@ urlpatterns = [
     path('relatorio/list-all-areas/<int:unidade_id>/', relatorioViews.list_all_areas),
     path('relatorio/obter-dados-unidade/', relatorioViews.obter_dados_unidade),
     path('relatorio/obter-dados-agencia/', relatorioViews.obter_dados_agencia),
+    path('relatorio/obter-dados-area-comercial/', relatorioViews.obter_dados_area_comercial),
     #Vendedor
     path('vendedor/find-byid/<int:id>/', vendedorViews.find_by_id),
     path('vendedor/create/', vendedorViews.create),
