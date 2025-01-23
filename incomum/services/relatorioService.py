@@ -360,7 +360,7 @@ def create_excel_byfilter(request) -> Response:
     data_consulta_final = request.GET.get('dataFim')
     unidade_selecionada = request.GET.get('unidade')
     areas_selecionadas = request.GET.getlist('areaComercial[]')
-    agencia_selecionada = request.GET.getlist('agencia[]')
+    agencia_selecionada = request.GET.getlist('agencias[]')
     vendedor_selecionada = request.GET.get('vendedor')
 
     # Consultando as áreas do usuário
