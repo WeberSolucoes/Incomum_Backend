@@ -408,7 +408,7 @@ def create_excel_byfilter(request) -> Response:
         params.append(tuple(agencia_selecionada))
 
     if vendedor_selecionada:
-        query += " AND ven_codigo IN = %s"
+        query += " AND ven_codigo IN %s"
         params.append(tuple(vendedor_selecionada))
 
     query += " ORDER BY fim_data"
