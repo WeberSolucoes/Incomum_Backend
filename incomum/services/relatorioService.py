@@ -361,7 +361,7 @@ def create_excel_byfilter(request) -> Response:
     unidade_selecionada = request.GET.get('unidade')
     areas_selecionadas = request.GET.getlist('areaComercial[]')
     agencia_selecionada = request.GET.getlist('agencias[]')
-    vendedor_selecionada = request.GET.get('vendedor')
+    vendedor_selecionada = request.GET.getlist('vendedor[]')
 
     # Consultando as áreas do usuário
     with connection.cursor() as cursor:
@@ -408,8 +408,8 @@ def create_excel_byfilter(request) -> Response:
         params.append(tuple(agencia_selecionada))
 
     if vendedor_selecionada:
-        query += " AND ven_codigo = %s"
-        params.append(vendedor_selecionada)
+        query += " AND ven_codigo IN = %s"
+        params.append(tuple(vendedor_selecionada))
 
     query += " ORDER BY fim_data"
 
