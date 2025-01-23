@@ -622,3 +622,65 @@ def obter_dados_agencia(request):
     }
 
     return Response(dados_grafico)
+
+
+from django.http import JsonResponse
+
+def obter_dados_area_comercial(request):
+    if request.method == "POST":
+        filters = request.data
+
+        # Exibir os filtros recebidos
+        print(f"Filtros recebidos: {filters}")
+
+        # Recupera os parâmetros da requisição
+        date_start = filters.get('startDate')
+        date_end = filters.get('endDate')
+        aco_codigo_param = filters.get('areas', [])
+
+        queryset = Relatorio.objects.all()
+
+        # Filtrar por intervalo de datas
+        if date_start:
+            try:
+                start_date = datetime.strptime(date_start, "%Y-%m-%d")
+                queryset = queryset.filter(fim_data__gte=start_date)
+            except ValueError:
+                print("Erro: Formato de data inicial inválido")
+                return JsonResponse({"detail": "Formato de data inicial inválido"}, status=400)
+
+        if date_end:
+            try:
+                end_date = datetime.strptime(date_end, "%Y-%m-%d")
+                queryset = queryset.filter(fim_data__lte=end_date)
+            except ValueError:
+                print("Erro: Formato de data final inválido")
+                return JsonResponse({"detail": "Formato de data final inválido"}, status=400)
+
+        # Filtrar por Área Comercial
+        if aco_codigo_param:
+            print(f"Filtrando pelas áreas comerciais: {aco_codigo_param}")
+            queryset = queryset.filter(aco_codigo__in=aco_codigo_param)
+
+        # Agrupar e somar os valores
+        resultados = (
+            queryset.values('aco_codigo', 'aco_descricao')
+            .annotate(soma_valor=Sum('fim_valorliquido'))
+            .order_by('-soma_valor')[:5]
+        )
+
+        # Exibir os resultados da consulta
+        print(f"Resultados da consulta: {list(resultados)}")
+
+        if not resultados:
+            return JsonResponse({"labels": [], "data": []})
+
+        dados_grafico = {
+            'labels': [item['aco_descricao'] for item in resultados],
+            'data': [item['soma_valor'] for item in resultados],
+        }
+
+        return JsonResponse(dados_grafico)
+
+    return JsonResponse({"detail": "Método não permitido"}, status=405)
+
