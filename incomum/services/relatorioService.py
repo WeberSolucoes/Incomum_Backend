@@ -405,7 +405,7 @@ def create_excel_byfilter(request) -> Response:
 
     if agencia_selecionada:
         query += " AND age_codigo = %s"
-        params.append(tuple((agencia_selecionada))
+        params.append(tuple(agencia_selecionada))
 
     if vendedor_selecionada:
         query += " AND ven_codigo = %s"
