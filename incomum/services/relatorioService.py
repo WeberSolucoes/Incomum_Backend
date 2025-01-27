@@ -95,7 +95,7 @@ def list_all_byfilter(request):
     data_consulta_final = request.GET.get('dataFim')
     unidade_selecionada = request.GET.get('unidades')
     areas_selecionadas = request.GET.getlist('areasComerciais')
-    agencia_selecionada = request.GET.get('agencias')
+    agencia_selecionada = request.GET.getlist('agencias')
     vendedor_selecionada = request.GET.get('vendedores')
 
     # Consultando as áreas do usuário
@@ -139,8 +139,8 @@ def list_all_byfilter(request):
         params.append(tuple(areas_selecionadas))
 
     if agencia_selecionada:
-        query += " AND age_codigo = %s"
-        params.append(agencia_selecionada)
+        query += " AND age_codigo IN %s"
+        params.append(tuple(agencia_selecionada))
 
     if vendedor_selecionada:
         query += " AND ven_codigo = %s"
