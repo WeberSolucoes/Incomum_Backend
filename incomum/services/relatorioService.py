@@ -637,6 +637,7 @@ def obter_dados_area_comercial(request):
         date_start = filters.get('startDate')
         date_end = filters.get('endDate')
         aco_codigo_param = filters.get('areas', [])
+        quantidade = filters.get('quantidade', 5)  # Padrão para 5 áreas, caso não seja passado
 
         queryset = Relatorio.objects.all()
 
@@ -666,7 +667,7 @@ def obter_dados_area_comercial(request):
         resultados = (
             queryset.values('aco_codigo', 'aco_descricao')
             .annotate(soma_valor=Sum('fim_valorliquido'))
-            .order_by('-soma_valor')[:5]
+            .order_by('-soma_valor')[:quantidade]  # Limitando pelos 'quantidade' de áreas
         )
 
         # Exibir os resultados da consulta
