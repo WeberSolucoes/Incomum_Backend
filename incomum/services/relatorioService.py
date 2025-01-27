@@ -96,7 +96,7 @@ def list_all_byfilter(request):
     unidade_selecionada = request.GET.get('unidades')
     areas_selecionadas = request.GET.getlist('areasComerciais')
     agencia_selecionada = request.GET.getlist('agencias')
-    vendedor_selecionada = request.GET.get('vendedores')
+    vendedor_selecionada = request.GET.getlist('vendedores')
 
     # Consultando as áreas do usuário
     with connection.cursor() as cursor:
@@ -143,8 +143,8 @@ def list_all_byfilter(request):
         params.append(tuple(agencia_selecionada))
 
     if vendedor_selecionada:
-        query += " AND ven_codigo = %s"
-        params.append(vendedor_selecionada)
+        query += " AND ven_codigo IN %s"
+        params.append(tuple(vendedor_selecionada))
 
     query += " ORDER BY fim_data"
 
