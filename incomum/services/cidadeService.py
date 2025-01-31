@@ -52,7 +52,6 @@ from django.db import connection
 
 def search_cidades(request):
     query = request.GET.get('q', '').strip()
-    print(f"Consultando por: {query}")
     
     if len(query) >= 3:
         with connection.cursor() as cursor:
