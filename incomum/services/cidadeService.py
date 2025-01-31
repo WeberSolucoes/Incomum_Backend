@@ -62,11 +62,9 @@ def search_cidades(request):
                 WHERE LOWER(TRIM(cid_descricao)) LIKE LOWER(%s)
             """
             parametro = f'%{query}%'
-            print(f"Executando SQL: {sql_query} com parâmetro {parametro}")
             
             cursor.execute(sql_query, [parametro])
             cidades = cursor.fetchall()
-            print(f"Resultados da consulta: {cidades}")
             
             cidade_list = [{'label': cidade[1], 'value': cidade[0]} for cidade in cidades]
             return Response(cidade_list, status=status.HTTP_200_OK)
