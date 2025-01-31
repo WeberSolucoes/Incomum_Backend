@@ -51,7 +51,7 @@ from django.db import connection
 from django.db import connection
 
 def search_cidades(request):
-    query = request.GET.get('q', '')
+    query = request.GET.get('q', '').strip()
     print(f"Consultando por: {query}")
     
     if len(query) >= 3:
@@ -59,10 +59,12 @@ def search_cidades(request):
             sql_query = """
                 SELECT cid_codigo, cid_descricao, cid_estado, reg_codigo, cid_pais, cid_sigla, pai_codigo
                 FROM cidade
-                WHERE cid_descricao LIKE %s
+                WHERE LOWER(TRIM(cid_descricao)) LIKE LOWER(%s)
             """
-            print(f"Executando SQL: {sql_query} com parâmetro {f'%{query}%'}")
-            cursor.execute(sql_query, [f'%{query}%'])
+            parametro = f'%{query}%'
+            print(f"Executando SQL: {sql_query} com parâmetro {parametro}")
+            
+            cursor.execute(sql_query, [parametro])
             cidades = cursor.fetchall()
             print(f"Resultados da consulta: {cidades}")
             
