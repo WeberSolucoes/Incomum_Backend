@@ -312,9 +312,6 @@ def list_all_agencias_byfilter(request) -> Response:
         """, [user_id])
         user_aco_codigos = [row[0] for row in cursor.fetchall()]
 
-    print(f'Usuário aco_codigos: {user_aco_codigos}')
-    print(f'Área comercial para filtro: {area_comercial}')
-
     with connection.cursor() as cursor:
         if area_comercial:
             # Ajusta o formato da área comercial para uma tupla
@@ -328,14 +325,12 @@ def list_all_agencias_byfilter(request) -> Response:
         else:
             # Se nenhuma área comercial foi selecionada, verificar user_aco_codigos
             if user_aco_codigos:
-                print(f'Filtro por ACO do usuário: {user_aco_codigos}')
                 cursor.execute("""
                     SELECT age_codigo, age_descricao
                     FROM agencia
                     WHERE aco_codigo IN %s
                 """, [tuple(user_aco_codigos)])
             else:
-                print('Nenhum filtro aplicado, retornando todos os registros.')
                 cursor.execute("""
                     SELECT age_codigo, age_descricao
                     FROM agencia
@@ -630,9 +625,6 @@ def obter_dados_area_comercial(request):
     if request.method == "POST":
         filters = request.data
 
-        # Exibir os filtros recebidos
-        print(f"Filtros recebidos: {filters}")
-
         # Recupera os parâmetros da requisição
         date_start = filters.get('startDate')
         date_end = filters.get('endDate')
@@ -647,7 +639,6 @@ def obter_dados_area_comercial(request):
                 start_date = datetime.strptime(date_start, "%Y-%m-%d")
                 queryset = queryset.filter(fim_data__gte=start_date)
             except ValueError:
-                print("Erro: Formato de data inicial inválido")
                 return JsonResponse({"detail": "Formato de data inicial inválido"}, status=400)
 
         if date_end:
@@ -655,12 +646,10 @@ def obter_dados_area_comercial(request):
                 end_date = datetime.strptime(date_end, "%Y-%m-%d")
                 queryset = queryset.filter(fim_data__lte=end_date)
             except ValueError:
-                print("Erro: Formato de data final inválido")
                 return JsonResponse({"detail": "Formato de data final inválido"}, status=400)
 
         # Filtrar por Área Comercial
         if aco_codigo_param:
-            print(f"Filtrando pelas áreas comerciais: {aco_codigo_param}")
             queryset = queryset.filter(aco_codigo__in=aco_codigo_param)
 
         # Agrupar e somar os valores
@@ -670,8 +659,6 @@ def obter_dados_area_comercial(request):
             .order_by('-soma_valor')[:quantidade]  # Limitando pelos 'quantidade' de áreas
         )
 
-        # Exibir os resultados da consulta
-        print(f"Resultados da consulta: {list(resultados)}")
 
         if not resultados:
             return JsonResponse({"labels": [], "data": []})
