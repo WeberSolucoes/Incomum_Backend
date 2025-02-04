@@ -22,39 +22,33 @@ def login(request):
     if request.method == 'POST':
         try:
             data = json.loads(request.body)
-            email = data.get('loginemail')
+            email = data.get('loginemail', '').strip().lower()  # Converte para minúsculas
             password = data.get('loginsenha')
 
-            # Se o usuário já está autenticado
             if request.user.is_authenticated:
                 return JsonResponse({'success': True, 'message': 'Você já está logado!'})
 
             print(f"Tentando autenticar: email={email}, senha={password}")
 
-            # Buscar o usuário pelo email
             try:
-                usuario = User.objects.get(email=email)
+                usuario = User.objects.get(email__iexact=email)  # Busca ignorando maiúsculas/minúsculas
             except User.DoesNotExist:
                 print("Usuário não encontrado.")
                 return JsonResponse({'success': False, 'error_message': 'Email ou senha inválidos.'}, status=400)
 
-            # Verificar se a senha está correta
             if not usuario.check_password(password):
                 print("Senha incorreta.")
                 return JsonResponse({'success': False, 'error_message': 'Email ou senha inválidos.'}, status=400)
 
-            # Verificar se o usuário está ativo
             if usuario.is_active:
-                auth_login(request, usuario)  # Login do usuário na sessão
+                auth_login(request, usuario)
 
-                # Gerar o token JWT
                 refresh = RefreshToken.for_user(usuario)
 
-                # Retornar o token de acesso e refresh
                 return JsonResponse({
                     'success': True,
-                    'access': str(refresh.access_token),  # Token de acesso
-                    'refresh': str(refresh),  # Token de atualização (opcional)
+                    'access': str(refresh.access_token),
+                    'refresh': str(refresh),
                     'message': 'Login efetuado com sucesso!'
                 })
             else:
