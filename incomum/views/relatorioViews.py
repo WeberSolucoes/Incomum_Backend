@@ -124,3 +124,35 @@ def obter_dados_agencia(request):
 @permission_classes([AllowAny])
 def obter_dados_area_comercial(request):
     return relatorioService.obter_dados_area_comercial(request)
+
+
+@swagger_auto_schema(
+        methods=['get'],
+        tags=['Relatorio'])
+@api_view(['GET'])
+@authentication_classes([JWTAuthentication])
+@permission_classes([AllowAny])
+def exportar_dados_agencia_para_excel(request):
+    return relatorioService.exportar_dados_agencia_para_excel(request)
+
+
+
+@swagger_auto_schema(
+        methods=['get'],
+        tags=['Relatorio'])
+@api_view(['GET'])
+@authentication_classes([JWTAuthentication])
+@permission_classes([AllowAny])
+def exportar_dados_loja_para_excel(request):
+    return relatorioService.exportar_dados_loja_para_excel(request)
+
+
+@swagger_auto_schema(
+        methods=['get'],
+        tags=['Relatorio'])
+@api_view(['GET'])
+@authentication_classes([JWTAuthentication])
+@permission_classes([AllowAny])
+def exportar_area_comercial_para_excel(request):
+    return relatorioService.exportar_area_comercial_para_excel(request)
+
