@@ -6,7 +6,8 @@ from incomum.models.loja import Loja
 from incomum.models.vendedor import Vendedor
 
 class Relatorio(models.Model):
-    tur_codigo = models.AutoField(primary_key=True)
+    fim_codigo = models.AutoField(primary_key=True)
+    tur_codigo = models.IntegerField()
     fim_data = models.DateField()
     fim_tipo = models.CharField(max_length=10)
     tur_numerovenda = models.CharField(max_length=20)
