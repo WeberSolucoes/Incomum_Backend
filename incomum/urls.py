@@ -64,6 +64,9 @@ urlpatterns = [
     path('relatorio/obter-dados-unidade/', relatorioViews.obter_dados_unidade),
     path('relatorio/obter-dados-agencia/', relatorioViews.obter_dados_agencia),
     path('relatorio/obter-dados-area-comercial/', relatorioViews.obter_dados_area_comercial),
+    path('relatorio/exportar-dados-agencia-excel/', relatorioViews.exportar_dados_agencia_para_excel),
+    path('relatorio/exportar-dados-unidade-excel/', relatorioViews.exportar_dados_loja_para_excel),
+    path('relatorio/exportar-dados-comercial-excel/', relatorioViews.exportar_area_comercial_para_excel),
     #Vendedor
     path('vendedor/find-byid/<int:id>/', vendedorViews.find_by_id),
     path('vendedor/create/', vendedorViews.create),
