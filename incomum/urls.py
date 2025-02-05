@@ -5,7 +5,7 @@ from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from django.conf import settings
 from django.conf.urls.static import static
 
-from .views import areaComercialViews, lojaViews, usuarioComercialViews, relatorioViews, relatorioViews,agenciaViews,vendedorViews,userViews,agenteViews,aeroportoViews,paisViews,cidadeViews,moedaViews,cepViews,departamentoViews,companhiaViews,assinaturaViews,classeViews,tipoAcomodacaoViews,tipoPadraoViews,tipoRegimeViews,situacaoTuristicoViews,servicoTuristicoViews,bandeiraViews,formaPagamentoViews,parceiroViews,parceiroContatoViews,bancoViews,despesasViews,centroCustoViews,subgrupoViews,despesasGeralViews 
+from .views import fornecedorTipoViews, areaComercialViews, lojaViews, usuarioComercialViews, relatorioViews, relatorioViews,agenciaViews,vendedorViews,userViews,agenteViews,aeroportoViews,paisViews,cidadeViews,moedaViews,cepViews,departamentoViews,companhiaViews,assinaturaViews,classeViews,tipoAcomodacaoViews,tipoPadraoViews,tipoRegimeViews,situacaoTuristicoViews,servicoTuristicoViews,bandeiraViews,formaPagamentoViews,parceiroViews,parceiroContatoViews,bancoViews,despesasViews,centroCustoViews,subgrupoViews,despesasGeralViews 
 urlpatterns = [
 
     path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
@@ -250,6 +250,13 @@ urlpatterns = [
     path('despesasgeral/update/<int:id>/', despesasGeralViews.update),
     path('despesasgeral/delete/<int:id>/', despesasGeralViews.delete),
     path('despesasgeral/list-all/', despesasGeralViews.list_all),
+
+    #Fornecedor Tipo
+    path('fornecedortipo/find-byid/<int:id>/', fornecedorTipoViews.find_by_id),
+    path('fornecedortipo/create/', fornecedorTipoViews.create),
+    path('fornecedortipo/update/<int:id>/', fornecedorTipoViews.update),
+    path('fornecedortipo/delete/<int:id>/', fornecedorTipoViews.delete),
+    path('fornecedortipo/list-all/', fornecedorTipoViews.list_all),
 
 
 
