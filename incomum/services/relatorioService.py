@@ -973,91 +973,82 @@ from collections import defaultdict
 from openpyxl.styles import Font, Alignment
 
 def exportar_area_comercial_para_excel(request):
-    filters = request.data
+    filters = request.GET
 
-    date_start = filters.get('date_start')
-    date_end = filters.get('date_end')
-    aco_codigo_param = filters.get('aco_codigo[]')
-    quantidade = int(filters.get('quantidade', 5))  # Converte para int
+    date_start = filters.get("date_start")
+    date_end = filters.get("date_end")
+    aco_codigo_param = filters.getlist('areas[]')  # Usando getlist para pegar o array com o nome correto
+    print("Áreas recebidas:", aco_codigo_param)  # Para depurar se o filtro foi recebido corretamente
+    
+    # Certificando-se de que a lista de áreas seja uma lista de inteiros válidos
+    aco_codigo_param = [int(area) for area in aco_codigo_param if area.isdigit()]
+    quantidade = int(filters.get("quantidade", 5))  # Quantidade padrão: 5
 
+    # Validação de datas
     if not date_start or not date_end:
         today = datetime.today()
-        date_start = today.replace(day=1).strftime('%Y-%m-%d')  # Primeiro dia do mês atual
-        date_end = today.replace(day=28).strftime('%Y-%m-%d')  # Último dia do mês atual
+        date_start = today.replace(day=1).strftime("%Y-%m-%d")
+        date_end = today.replace(day=28).strftime("%Y-%m-%d")
 
-    start_date = datetime.strptime(date_start, '%Y-%m-%d')
-    end_date = datetime.strptime(date_end, '%Y-%m-%d')
+    start_date = datetime.strptime(date_start, "%Y-%m-%d")
+    end_date = datetime.strptime(date_end, "%Y-%m-%d")
 
     queryset = Relatorio.objects.all()
 
-    if date_start:
-        queryset = queryset.filter(fim_data__gte=start_date)
+    # Filtrando pela data
+    queryset = queryset.filter(fim_data__range=[start_date, end_date])
 
-    if date_end:
-        queryset = queryset.filter(fim_data__lte=end_date)
-
+    # Filtrando pelas áreas comerciais SE as áreas forem passadas
     if aco_codigo_param:
-        queryset = queryset.filter(aco_codigo__in=aco_codigo_param)
+        queryset = queryset.filter(aco_codigo__in=aco_codigo_param)  # Filtrando pelas áreas selecionadas
+        print(f"Filtrando pelas áreas comerciais: {aco_codigo_param}")
+    else:
+        print("Nenhuma área comercial foi selecionada. Aplicando filtro por quantidade.")
 
-    # Agrupar por área comercial e somar valores
-    area_comercial_totals = defaultdict(float)
-    data_por_area = defaultdict(list)
+    # Agrupar por área comercial e calcular total
+    area_comercial_totals = (
+        queryset.values("aco_codigo", "aco_descricao")
+        .annotate(soma_valor=Sum("fim_valorliquido"))
+        .order_by("-soma_valor")  # Ordenando do maior para o menor valor
+    )
 
-    for item in queryset.values('aco_codigo', 'aco_descricao', 'fim_valorliquido', 'fim_data'):
-        area_comercial_totals[item['aco_codigo']] += item['fim_valorliquido']
-        data_por_area[item['aco_codigo']].append(item)
+    # Aplicando o limite de quantidade
+    area_comercial_totals = list(area_comercial_totals)[:quantidade]
 
-    # Ordenar áreas comerciais pelo total e pegar apenas as `quantidade` maiores
-    top_areas = sorted(area_comercial_totals.keys(), key=lambda x: area_comercial_totals[x], reverse=True)[:quantidade]
+    # Calculando o total geral
+    total_geral = sum(area["soma_valor"] for area in area_comercial_totals)
 
-    # Criar um arquivo Excel
+    # Criando o arquivo Excel
     wb = Workbook()
     ws = wb.active
     ws.title = "Relatório Área Comercial"
 
-    headers = ["Código Área Comercial", "Área Comercial", "Valor Líquido", "Data Fim"]
+    headers = ["Código Área Comercial", "Área Comercial", "Valor Total"]
     ws.append(headers)
 
     for col_num, header in enumerate(headers, 1):
-        col_letter = get_column_letter(col_num)
-        ws[f"{col_letter}1"].font = Font(bold=True)
+        ws[f"{get_column_letter(col_num)}1"].font = Font(bold=True)
 
-    total_geral = 0
+    # Preenchendo as linhas com dados
+    for area in area_comercial_totals:
+        ws.append([ 
+            area["aco_codigo"],
+            area["aco_descricao"],
+            locale.currency(area["soma_valor"], grouping=True, symbol=True)  # Formatação correta
+        ])
 
-    for aco_codigo in top_areas:
-        area_total = 0
-        for item in data_por_area[aco_codigo]:
-            valor_total = locale.currency(item['fim_valorliquido'], grouping=True, symbol=True)
-            fim_data = item.get('fim_data', 'Data não disponível')
+    # Adicionando o total geral
+    ws.append(["", "TOTAL GERAL", locale.currency(total_geral, grouping=True, symbol=True)])
 
-            # Garantir que a data seja formatada corretamente
-            if isinstance(fim_data, datetime):
-                fim_data = fim_data.strftime('%d/%m/%Y')  # Formato DD/MM/YYYY
-
-            ws.append([item['aco_codigo'], item['aco_descricao'], valor_total, fim_data])
-            area_total += item['fim_valorliquido']
-
-        ws.append(["", "Total Área Comercial", locale.currency(area_total, grouping=True, symbol=True), ""])
-        total_geral += area_total
-        ws.append([])  # Linha em branco entre áreas
-
-    ws.append(["", "Total Geral", locale.currency(total_geral, grouping=True, symbol=True), ""])
-
-    # Ajustar automaticamente a largura das colunas
+    # Ajustando o tamanho das colunas
     for col in ws.columns:
-        max_length = 0
-        col_letter = get_column_letter(col[0].column)  # Pega a letra da coluna
+        max_length = max(len(str(cell.value)) for cell in col if cell.value)
+        ws.column_dimensions[get_column_letter(col[0].column)].width = max_length + 2
 
-        for cell in col:
-            try:
-                if cell.value:
-                    max_length = max(max_length, len(str(cell.value)))
-            except:
-                pass
-
-        ws.column_dimensions[col_letter].width = max_length + 2  # Ajusta largura automaticamente
-
-    response = HttpResponse(content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+    # Retornando o arquivo Excel como resposta
+    response = HttpResponse(
+        content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    )
     response["Content-Disposition"] = f'attachment; filename="relatorio_area_comercial_{datetime.now().strftime("%Y%m%d%H%M%S")}.xlsx"'
     wb.save(response)
 
