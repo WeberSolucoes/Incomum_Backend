@@ -586,6 +586,8 @@ def obter_dados_agencia(request):
     age_codigo_param = request.GET.getlist('age_codigo[]')  # Agência como lista
     date_start = request.GET.get('date_start')  # Data inicial
     date_end = request.GET.get('date_end')      # Data final
+    unidade = request.GET.get('unidade')
+    area = request.GET.getlist('area[]')
 
     # Consulta inicial
     queryset = Relatorio.objects.all()
@@ -605,11 +607,18 @@ def obter_dados_agencia(request):
     if age_codigo_param and "todos" not in age_codigo_param:
         queryset = queryset.filter(age_codigo__in=age_codigo_param)
 
+    if unidade:
+        queryset = queryset.filter(loj_codigo=unidade)
+
+    if area:
+        queryset = queryset.filter(aco_codigo__in=area)  
+
     # Agrupar e somar os valores
     resultados = (
         queryset.values('age_codigo', 'age_descricao')
         .annotate(soma_valor=Round(Sum('fim_valorliquido'), 2))
-        .order_by('-soma_valor')[:10]
+        .order_by('-soma_valor')  # Ordena pela soma de forma decrescente
+        [:10]
     )
 
     # Formatar os dados para o gráfico
