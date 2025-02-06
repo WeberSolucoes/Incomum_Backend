@@ -586,7 +586,7 @@ def obter_dados_agencia(request):
     age_codigo_param = request.GET.getlist('age_codigo[]')  # Agência como lista
     date_start = request.GET.get('date_start')  # Data inicial
     date_end = request.GET.get('date_end')      # Data final
-    unidade = request.GET.get('unidade')
+    unidade = request.GET.get('loj_codigo')
     area = request.GET.getlist('area[]')
 
     print(f"Filtrando por unidade: {unidade}, área comercial: {area}") 
