@@ -677,54 +677,61 @@ def obter_dados_area_comercial(request):
 
 
 def exportar_dados_agencia_para_excel(request):
-    # Configura o local para o Brasil (R$)
-    locale.setlocale(locale.LC_ALL, 'pt_BR.UTF-8')  # Ajuste conforme necessário
+    locale.setlocale(locale.LC_ALL, 'pt_BR.UTF-8')  # Definir local para Brasil (R$)
 
     # Parâmetros de filtro
     age_codigo_param = request.GET.getlist("age_codigo[]")  
     date_start = request.GET.get("date_start")  
-    date_end = request.GET.get("date_end")      
-    num_agencias = int(request.GET.get("num_agencias", 10))  # Default para 10
+    date_end = request.GET.get("date_end")
+    unidade = request.GET.get("unidade")  
+    area = request.GET.getlist("areas[]")  
+    num_agencias = int(request.GET.get("num_agencias", 10))  
 
-    # Se não foi passado o filtro de data, usar o mês atual
+    # Se não tiver datas, usar mês atual
     if not date_start or not date_end:
         today = datetime.today()
-        date_start = today.replace(day=1).strftime('%Y-%m-%d')  # Primeiro dia do mês atual
-        date_end = today.replace(day=28).strftime('%Y-%m-%d')  # Último dia do mês atual (geralmente 28)
+        date_start = today.replace(day=1).strftime('%Y-%m-%d')
+        date_end = today.replace(day=28).strftime('%Y-%m-%d')
 
-    # Converter as strings de data em objetos de data
     start_date = parse_date(date_start)
     end_date = parse_date(date_end)
 
     # Consulta inicial
     queryset = Relatorio.objects.all()
 
-    # Aplicar filtros de data
+    # Aplicar filtros
     if start_date:
         queryset = queryset.filter(fim_data__gte=start_date)
 
     if end_date:
         queryset = queryset.filter(fim_data__lte=end_date)
 
-    # Filtrar por agência
     if age_codigo_param and "todos" not in age_codigo_param:
         queryset = queryset.filter(age_codigo__in=age_codigo_param)
 
-    # Ordenar pelas agências com maior valor total de vendas e limitar o número de resultados
-    queryset = queryset.values('age_codigo', 'age_descricao') \
-                       .annotate(total_vendas=Sum('fim_valorliquido')) \
-                       .order_by('-total_vendas')[:num_agencias]  # Limitar pelas maiores vendas
+    if unidade:
+        queryset = queryset.filter(loj_codigo=unidade)
 
-    # Criar um arquivo Excel
+    if area:  # Filtro corrigido para área comercial
+        queryset = queryset.filter(aco_codigo__in=area)
+
+    # Log dos filtros aplicados
+    print(f"Filtro unidade: {unidade}, Filtro área: {area}")
+
+    # Agrupar e somar valores
+    resultados = (
+        queryset.values('age_codigo', 'age_descricao')
+        .annotate(total_vendas=Round(Sum('fim_valorliquido'), 2))
+        .order_by('-total_vendas')[:num_agencias]
+    )
+
+    # Criar planilha
     wb = Workbook()
     ws = wb.active
     ws.title = "Relatório de Agências"
 
-    # Criar cabeçalho
-    headers = [
-        "Código Agência", "Agência", "Data", "Valor Líquido", 
-        "Markup", "Valor Inc.", "Valor Inc. Ajustado"
-    ]
+    # Cabeçalhos
+    headers = ["Código Agência", "Agência", "Total de Vendas"]
     ws.append(headers)
 
     # Estilizar cabeçalho
@@ -732,67 +739,34 @@ def exportar_dados_agencia_para_excel(request):
         col_letter = get_column_letter(col_num)
         ws[f"{col_letter}1"].font = Font(bold=True)
 
-    # Adicionar dados ao Excel
-    total_geral = 0  # Inicializa a variável para o total geral
-    last_agency = None  # Controlar a mudança de agência para mostrar os registros dela
-    current_row = 2  # A partir da linha 2 para os dados
+    # Adicionar dados
+    total_geral = 0  
+    current_row = 2  
 
-    for item in queryset:  
-        # Acessando os dados como dicionário
-        agency_code = item['age_codigo']  # Código da agência
-        agency_desc = item['age_descricao']  # Descrição da agência
+    if resultados.exists():
+        for item in resultados:
+            agency_code = item['age_codigo']
+            agency_desc = item['age_descricao']
+            agency_total = item['total_vendas']
 
-        if last_agency != agency_code:  # Se a agência mudar, adicionar uma linha para a mudança
-            if last_agency is not None:  # Adicionar uma linha em branco entre agências
-                ws.append(["", "", "", "", "", "", ""])  # Linha em branco
+            formatted_agency_total = locale.currency(agency_total, grouping=True, symbol=True)
 
-            last_agency = agency_code  # Atualiza a agência atual
+            ws.append([agency_code, agency_desc, formatted_agency_total])
+            total_geral += agency_total
+            current_row += 1  
 
-        # Adiciona os registros para cada agência
-        agencia_vendas = Relatorio.objects.filter(age_codigo=agency_code, fim_data__gte=start_date, fim_data__lte=end_date)  # Filtro de data aplicado aqui
-        agency_total = 0  # Total da agência
-
-        for reg in agencia_vendas:
-            # Formatar os valores com a função locale.currency
-            valor_liquido = locale.currency(reg.fim_valorliquido, grouping=True, symbol=True)  # Formato R$
-            valor_inc = locale.currency(reg.fim_valorinc, grouping=True, symbol=True)  # Formato R$
-            valor_incajustado = locale.currency(reg.fim_valorincajustado, grouping=True, symbol=True)  # Formato R$
-
-            ws.append([  
-                reg.age_codigo,
-                reg.age_descricao,
-                reg.fim_data.strftime("%d/%m/%Y") if reg.fim_data else "",
-                valor_liquido,
-                reg.fim_markup,
-                valor_inc,
-                valor_incajustado
-            ])
-            agency_total += reg.fim_valorliquido  # Somar os valores para o total da agência
-            current_row += 1  # Mover para a próxima linha após adicionar um registro
-
-        # Adicionar o total da agência abaixo de seus registros
-        ws.append(["", "", f"Total da Agência {agency_desc}: ",locale.currency(agency_total, grouping=True, symbol=True), "" "", ""])
+        # Adicionar linha do total geral
+        ws.append(["", "Total Geral:", locale.currency(total_geral, grouping=True, symbol=True)])
         ws[f"B{current_row}"].font = Font(bold=True)
-        ws[f"C{current_row}"].font = Font(bold=True)
-        total_geral += agency_total  # Somar o total da agência ao total geral
+    else:
+        ws.append(["Nenhum dado encontrado para os filtros aplicados."])
 
-        # Adicionar uma linha em branco após o total da agência
-        current_row += 1  
-
-    # Adicionar a linha do total geral no final
-    ws.append(["", "", "Total Geral:",locale.currency(total_geral, grouping=True, symbol=True), "", "", ""])
-    ws[f"B{current_row}"].font = Font(bold=True)
-    ws[f"C{current_row}"].font = Font(bold=True)
-
-    # Criar a resposta HTTP com o arquivo Excel
+    # Retornar arquivo Excel
     response = HttpResponse(content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
     response["Content-Disposition"] = f'attachment; filename="relatorio_agencias_{datetime.now().strftime("%Y%m%d%H%M%S")}.xlsx"'
 
-    # Salvar o arquivo na resposta
     wb.save(response)
-
     return response
-
 
 import csv
 from openpyxl.styles import Alignment, Font, PatternFill, Border, Side
@@ -844,8 +818,7 @@ def exportar_dados_loja_para_excel(request):
 
     # Criar cabeçalho
     headers = [
-        "Código Loja", "Loja", "Data", "Valor Líquido", 
-        "Markup", "Valor Inc.", "Valor Inc. Ajustado"
+        "Código Loja", "Loja", "Total Valor Líquido"
     ]
     ws.append(headers)
 
@@ -870,11 +843,7 @@ def exportar_dados_loja_para_excel(request):
     colunas_config = {
         "A": 12,  # Código Loja
         "B": 25,  # Nome da Loja
-        "C": 12,  # Data
-        "D": 15,  # Valor Líquido
-        "E": 10,  # Markup
-        "F": 15,  # Valor Inc.
-        "G": 18,  # Valor Inc. Ajustado
+        "C": 15,  # Total Valor Líquido
     }
 
     # Aplicar largura e alinhamento às colunas
@@ -901,63 +870,25 @@ def exportar_dados_loja_para_excel(request):
 
         if last_loja != loj_codigo:  # Se a loja mudar, adicionar uma linha para a mudança
             if last_loja is not None:  # Adicionar uma linha em branco entre lojas
-                ws.append(["", "", "", "", "", "", ""])  # Linha em branco
+                ws.append(["", "", ""])  # Linha em branco
 
             last_loja = loj_codigo  # Atualiza a loja atual
 
-        # Adicionar os registros para cada loja
-        loja_vendas = Relatorio.objects.filter(loj_codigo=loj_codigo, fim_data__gte=start_date, fim_data__lte=end_date)  # Filtro de data aplicado aqui
-        loja_total = 0  # Total da loja
+        # Somar os valores para o total da loja
+        loja_total = item['total_vendas']  # A soma já foi calculada na consulta
 
-        for reg in loja_vendas:
-            # Formatar os valores com a função locale.currency
-            valor_liquido = locale.currency(reg.fim_valorliquido, grouping=True, symbol=True)  # Formato R$
-            valor_inc = locale.currency(reg.fim_valorinc, grouping=True, symbol=True)  # Formato R$
-            valor_incajustado = locale.currency(reg.fim_valorincajustado, grouping=True, symbol=True)  # Formato R$
+        # Adicionar apenas o total da unidade (sem registros individuais)
+        ws.append([
+            loj_codigo,
+            loja_desc,
+            locale.currency(loja_total, grouping=True, symbol=True)
+        ])
 
-            ws.append([  
-                reg.loj_codigo,
-                loja_desc,
-                reg.fim_data.strftime("%d/%m/%Y") if reg.fim_data else "",
-                valor_liquido,
-                reg.fim_markup,
-                valor_inc,
-                valor_incajustado
-            ])
-            loja_total += reg.fim_valorliquido  # Somar os valores para o total da loja
-            current_row += 1  # Mover para a próxima linha após adicionar um registro
-
-        # Adicionar o total da loja abaixo de seus registros
-        ws.append(["", "", f"Total da Unidade {loja_desc}: ", locale.currency(loja_total, grouping=True, symbol=True), "", "", ""])
-        ws[f"B{current_row}"].font = Font(bold=True)
-        ws[f"C{current_row}"].font = Font(bold=True)
         total_geral += loja_total  # Somar o total da loja ao total geral
-
-        # Adicionar uma linha em branco após o total da loja
-        current_row += 1  
+        current_row += 1  # Mover para a próxima linha após adicionar o total da unidade
 
     # Adicionar a linha do total geral no final
-    ws.append(["", "", "Total Geral:", locale.currency(total_geral, grouping=True, symbol=True), "", "", ""])
-    ws[f"B{current_row}"].font = Font(bold=True)
-    ws[f"C{current_row}"].font = Font(bold=True)
-
-    # Aplicar bordas finas mais suaves a todas as células
-    soft_border = Border(
-        left=Side(style="thin", color="E1E1E1"),  # Cor mais suave para as bordas
-        right=Side(style="thin", color="E1E1E1"),
-        top=Side(style="thin", color="E1E1E1"),
-        bottom=Side(style="thin", color="E1E1E1")
-    )
-    
-    for row in ws.iter_rows(min_row=2, max_row=ws.max_row, min_col=1, max_col=len(headers)):
-        for cell in row:
-            cell.border = soft_border
-
-    # Negrito nos totais das lojas e total geral
-    for row in range(2, ws.max_row + 1):
-        if "Total da Unidade" in str(ws[f"C{row}"].value) or "Total Geral" in str(ws[f"C{row}"].value):
-            ws[f"C{row}"].font = Font(bold=True)
-            ws[f"D{row}"].font = Font(bold=True)
+    ws.append(["", "Total Geral:",locale.currency(total_geral, grouping=True, symbol=True), ""])
 
     # Criar a resposta HTTP com o arquivo Excel
     response = HttpResponse(content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
