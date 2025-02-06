@@ -589,7 +589,7 @@ def obter_dados_agencia(request):
     unidade = request.GET.get('unidade')
     area = request.GET.getlist('area[]')
 
-     print(f"Filtrando por unidade: {unidade}, área comercial: {area}") 
+    print(f"Filtrando por unidade: {unidade}, área comercial: {area}") 
 
     # Consulta inicial
     queryset = Relatorio.objects.all()
