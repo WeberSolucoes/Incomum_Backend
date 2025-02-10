@@ -21,7 +21,7 @@ def create(request) -> Response:
 
 def update(request, id) -> Response:
     try:
-        loja: Loja = TipoPadrao.objects.get(tac_codigo = id)
+        loja: Loja = TipoPadrao.objects.get(tpa_codigo = id)
     except TipoPadrao.DoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND)
 
