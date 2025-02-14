@@ -5,7 +5,7 @@ from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from django.conf import settings
 from django.conf.urls.static import static
 
-from .views import fornecedorTipoViews, areaComercialViews, lojaViews, usuarioComercialViews, relatorioViews, relatorioViews,agenciaViews,vendedorViews,userViews,agenteViews,aeroportoViews,paisViews,cidadeViews,moedaViews,cepViews,departamentoViews,companhiaViews,assinaturaViews,classeViews,tipoAcomodacaoViews,tipoPadraoViews,tipoRegimeViews,situacaoTuristicoViews,servicoTuristicoViews,bandeiraViews,formaPagamentoViews,parceiroViews,parceiroContatoViews,bancoViews,despesasViews,centroCustoViews,subgrupoViews,despesasGeralViews 
+from .views import protocoloViews,fornecedorTipoViews, areaComercialViews, lojaViews, usuarioComercialViews, relatorioViews, relatorioViews,agenciaViews,vendedorViews,userViews,agenteViews,aeroportoViews,paisViews,cidadeViews,moedaViews,cepViews,departamentoViews,companhiaViews,assinaturaViews,classeViews,tipoAcomodacaoViews,tipoPadraoViews,tipoRegimeViews,situacaoTuristicoViews,servicoTuristicoViews,bandeiraViews,formaPagamentoViews,parceiroViews,parceiroContatoViews,bancoViews,despesasViews,centroCustoViews,subgrupoViews,despesasGeralViews 
 urlpatterns = [
 
     path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
@@ -257,6 +257,13 @@ urlpatterns = [
     path('fornecedortipo/update/<int:id>/', fornecedorTipoViews.update),
     path('fornecedortipo/delete/<int:id>/', fornecedorTipoViews.delete),
     path('fornecedortipo/list-all/', fornecedorTipoViews.list_all),
+
+
+    path('protocolo/find-byid/<int:id>/', protocoloViews.find_by_id),
+    path('protocolo/create/', protocoloViews.create),
+    path('protocolo/update/<int:id>/', protocoloViews.update),
+    path('protocolo/delete/<int:id>/', protocoloViews.delete),
+    path('protocolo/list-all/', protocoloViews.list_all),
 
 
 
