@@ -51,6 +51,15 @@ class Protocolo(models.Model):
     prt_emprestimo = models.IntegerField(null=True, blank=True)
 
 
+    def save(self, force_insert=False, force_update=False, *args, **kwargs):
+        for field in self._meta.fields:
+            if isinstance(field, models.CharField):
+                value = getattr(self, field.name)
+                if value:
+                    setattr(self, field.name, value.upper())
+        super(Protocolo, self).save(force_insert, force_update, *args, **kwargs)
+
+
     class Meta:
         db_table = 'protocolo'
         #managed = False
