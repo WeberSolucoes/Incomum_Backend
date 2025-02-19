@@ -22,6 +22,15 @@ class Vendedor(models.Model):
     ven_descricaoweb = models.CharField(max_length=60, blank=True, null=True)
     ven_codigoimportacao = models.IntegerField(blank=True, null=True)
     sve_codigo = models.IntegerField(blank=True, null=True)
+
+    def save(self, force_insert=False, force_update=False, *args, **kwargs):
+        for field in self._meta.fields:
+            if isinstance(field, models.CharField):
+                value = getattr(self, field.name)
+                if value:
+                    setattr(self, field.name, value.upper())
+        super(Vendedor, self).save(force_insert, force_update, *args, **kwargs)
+    
     class Meta:
         db_table = 'vendedor'
         verbose_name = 'Vendedor'
