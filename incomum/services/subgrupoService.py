@@ -41,6 +41,6 @@ def delete(id) -> Response:
     return Response(status=status.HTTP_204_NO_CONTENT)
 
 def list_all() -> Response:
-    lojas = Subgrupo.objects.all()
+    lojas = Subgrupo.objects.all().order_by('sbc_descricao')
     serializer = SubgrupoSerializer(lojas, many=True)
     return Response(serializer.data)
