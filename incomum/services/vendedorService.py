@@ -8,7 +8,7 @@ def find_by_id(id):
     return Response(VendedorSerializer(entity).data, status=status.HTTP_200_OK)
 
 def list_all():
-    entities = Vendedor.objects.all()
+    entities = Vendedor.objects.all().order_by('ven_descricao')
     return Response(VendedorSerializer(entities, many=True).data, status=status.HTTP_200_OK)
 
 def create(request):
