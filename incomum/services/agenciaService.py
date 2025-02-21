@@ -15,7 +15,7 @@ def find_by_id(id):
     return Response(AgenciaSerializer(entity).data, status=status.HTTP_200_OK)
 
 def list_all():
-    entities = Agencia.objects.all()
+    entities = Agencia.objects.all().order_by('age_descricao')
     return Response(AgenciaSerializer(entities, many=True).data, status=status.HTTP_200_OK)
 
 def create(request):
