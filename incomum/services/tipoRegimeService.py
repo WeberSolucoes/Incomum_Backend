@@ -41,6 +41,6 @@ def delete(id) -> Response:
     return Response(status=status.HTTP_204_NO_CONTENT)
 
 def list_all() -> Response:
-    lojas = TipoRegime.objects.all()
+    lojas = TipoRegime.objects.all().order_by('tre_descricao')
     serializer = TipoRegimeSerializer(lojas, many=True)
     return Response(serializer.data)
