@@ -41,6 +41,6 @@ def delete(id) -> Response:
     return Response(status=status.HTTP_204_NO_CONTENT)
 
 def list_all() -> Response:
-    lojas = SituacaoTuristico.objects.all()
+    lojas = SituacaoTuristico.objects.all().order_by('stu_descricao')
     serializer = SituacaoTuristicoSerializer(lojas, many=True)
     return Response(serializer.data)
