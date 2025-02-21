@@ -41,6 +41,6 @@ def delete(id) -> Response:
     return Response(status=status.HTTP_204_NO_CONTENT)
 
 def list_all() -> Response:
-    lojas = CentroCusto.objects.all()
+    lojas = CentroCusto.objects.all().order_by('cta_descricao')
     serializer = CentroCustoSerializer(lojas, many=True)
     return Response(serializer.data)
