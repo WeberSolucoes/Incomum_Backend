@@ -15,7 +15,7 @@ def find_by_id(id):
     return Response(AeroportoSerializer(entity).data, status=status.HTTP_200_OK)
 
 def list_all():
-    entities = Aeroporto.objects.all()
+    entities = Aeroporto.objects.all().order_by('aer_descricao')
     return Response(AeroportoSerializer(entities, many=True).data, status=status.HTTP_200_OK)
 
 def create(request):
