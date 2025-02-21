@@ -10,7 +10,7 @@ def find_by_id(id):
     return Response(AgenteSerializer(entity).data, status=status.HTTP_200_OK)
 
 def list_all():
-    entities = Agente.objects.all()
+    entities = Agente.objects.all().order_by('agt_descricao')
     return Response(AgenteSerializer(entities, many=True).data, status=status.HTTP_200_OK)
 
 def create(request):
