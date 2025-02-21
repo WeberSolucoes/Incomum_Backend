@@ -41,6 +41,6 @@ def delete(id) -> Response:
     return Response(status=status.HTTP_204_NO_CONTENT)
 
 def list_all() -> Response:
-    lojas = Banco.objects.all()
+    lojas = Banco.objects.all().order_by('ban_descricao')
     serializer = BancoSerializer(lojas, many=True)
     return Response(serializer.data)
