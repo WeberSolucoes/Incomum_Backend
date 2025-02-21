@@ -41,6 +41,6 @@ def delete(id) -> Response:
     return Response(status=status.HTTP_204_NO_CONTENT)
 
 def list_all() -> Response:
-    lojas = Cep.objects.all()
+    lojas = Cep.objects.all().order_by('cep_logradouro')
     serializer = CepSerializer(lojas, many=True)
     return Response(serializer.data)
