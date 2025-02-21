@@ -41,6 +41,6 @@ def delete(id) -> Response:
     return Response(status=status.HTTP_204_NO_CONTENT)
 
 def list_all() -> Response:
-    lojas = Bandeira.objects.all()
+    lojas = Bandeira.objects.all().order_by('ban_descricao')
     serializer = BandeiraSerializer(lojas, many=True)
     return Response(serializer.data)
