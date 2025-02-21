@@ -41,6 +41,6 @@ def delete(id) -> Response:
     return Response(status=status.HTTP_204_NO_CONTENT)
 
 def list_all() -> Response:
-    lojas = Duplicata.objects.all()
+    lojas = Duplicata.objects.all().order_by('tdu_descricao')
     serializer = DuplicataSerializer(lojas, many=True)
     return Response(serializer.data)
