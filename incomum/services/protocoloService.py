@@ -5,7 +5,7 @@ from ..serializers.protocoloSerializer import *
 
 def findById(id) -> Response:
     try:
-        loja: Loja = Procotolo.objects.get(prt_codigo = id)
+        loja: Loja = Protocolo.objects.get(prt_codigo = id)
     except Protocolo.DoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND)
 
