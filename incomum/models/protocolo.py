@@ -3,8 +3,8 @@ from incomum.models.parceiro import Parceiro
 
 class Protocolo(models.Model):
     prt_codigo = models.AutoField(primary_key=True)
-    prt_datacadastro = models.IntegerField(null=True, blank=True)
-    prt_datapagamento = models.IntegerField(null=True, blank=True)
+    prt_datacadastro = models.DateTimeField(null=True, blank=True, auto_now_add=True)
+    prt_datapagamento = models.CharField(max_length=255,null=True, blank=True)
     prt_valor = models.IntegerField(null=True, blank=True)
     usr_codigo = models.IntegerField(null=True, blank=True)
     cta_codigo = models.IntegerField(null=True, blank=True)
@@ -15,7 +15,7 @@ class Protocolo(models.Model):
     prt_numerodocumento = models.IntegerField(null=True, blank=True)
     prt_notafiscal = models.IntegerField(null=True, blank=True)
     spr_codigo = models.IntegerField(null=True, blank=True)
-    prt_datavencimento = models.IntegerField(null=True, blank=True)
+    prt_datavencimento = models.CharField(max_length=255,null=True, blank=True)
     tdu_codigo = models.IntegerField(null=True, blank=True)
     tpa_codigopagamento = models.IntegerField(null=True, blank=True)
     usr_codigopagamento = models.IntegerField(null=True, blank=True)
@@ -29,8 +29,8 @@ class Protocolo(models.Model):
     moe_codigopagamento = models.IntegerField(null=True, blank=True)
     prt_cambiopagamento = models.IntegerField(null=True, blank=True)
     prt_previsao = models.IntegerField(null=True, blank=True)
-    prt_datacompetencia = models.IntegerField(null=True, blank=True)
-    prt_anomescompetencia = models.IntegerField(null=True, blank=True)
+    prt_datacompetencia = models.CharField(max_length=255,null=True, blank=True)
+    prt_anomescompetencia = models.CharField(max_length=255,null=True, blank=True)
     prt_transferencia = models.IntegerField(null=True, blank=True)
     prt_numeropagamento = models.IntegerField(null=True, blank=True)
     prt_pagamentoexterno = models.IntegerField(null=True, blank=True)
@@ -40,8 +40,8 @@ class Protocolo(models.Model):
     prt_numerocheque = models.IntegerField(null=True, blank=True)
     age_codigoprogramado = models.IntegerField(null=True, blank=True)
     usr_codigoprogramado = models.IntegerField(null=True, blank=True)
-    prt_dataprogramado = models.IntegerField(null=True, blank=True)
-    prt_dataquitacao = models.IntegerField(null=True, blank=True)
+    prt_dataprogramado = models.CharField(max_length=255,null=True, blank=True)
+    prt_dataquitacao = models.CharField(max_length=255,null=True, blank=True)
     prt_status = models.IntegerField(null=True, blank=True)
     via_codigo = models.IntegerField(null=True, blank=True)
     vem_codigo = models.IntegerField(null=True, blank=True)
@@ -49,6 +49,7 @@ class Protocolo(models.Model):
     prt_parcela = models.IntegerField(null=True, blank=True)
     prt_parcelatotal = models.IntegerField(null=True, blank=True)
     prt_emprestimo = models.IntegerField(null=True, blank=True)
+
 
 
     def save(self, force_insert=False, force_update=False, *args, **kwargs):
