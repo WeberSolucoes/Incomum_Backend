@@ -5,7 +5,7 @@ class Protocolo(models.Model):
     prt_codigo = models.AutoField(primary_key=True)
     prt_datacadastro = models.DateTimeField(null=True, blank=True, auto_now_add=True)
     prt_datapagamento = models.CharField(max_length=255,null=True, blank=True)
-    prt_valor = models.IntegerField(null=True, blank=True)
+    prt_valor = models.FloatField(null=True, blank=True)
     usr_codigo = models.IntegerField(null=True, blank=True)
     cta_codigo = models.IntegerField(null=True, blank=True)
     prt_observacao = models.CharField(max_length=255,null=True, blank=True)
@@ -27,7 +27,7 @@ class Protocolo(models.Model):
     moe_codigo = models.IntegerField(null=True, blank=True)
     prt_cambio = models.IntegerField(null=True, blank=True)
     moe_codigopagamento = models.IntegerField(null=True, blank=True)
-    prt_cambiopagamento = models.IntegerField(null=True, blank=True)
+    prt_cambiopagamento = models.FloatField(null=True, blank=True)
     prt_previsao = models.IntegerField(null=True, blank=True)
     prt_datacompetencia = models.CharField(max_length=255,null=True, blank=True)
     prt_anomescompetencia = models.CharField(max_length=255,null=True, blank=True)
@@ -47,7 +47,7 @@ class Protocolo(models.Model):
     vem_codigo = models.IntegerField(null=True, blank=True)
     prt_tipo = models.IntegerField(null=True, blank=True)
     prt_parcela = models.IntegerField(null=True, blank=True)
-    prt_parcelatotal = models.IntegerField(null=True, blank=True)
+    prt_parcelatotal = models.FloatField(null=True, blank=True)
     prt_emprestimo = models.IntegerField(null=True, blank=True)
 
 
