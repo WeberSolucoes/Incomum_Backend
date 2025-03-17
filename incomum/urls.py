@@ -76,6 +76,7 @@ urlpatterns = [
 
     #Usuario
     path('usuario/login/', userViews.login),
+    path('usuario/get-id/', userViews.get_user_id),
     path('usuario/permission/', userViews.user_permissions_view),
     path('usuario/recuperar-senha/', userViews.PasswordRequest),
     path('usuario/redefinir-senha/<uid>/<token>/', userViews.PasswordReset),
@@ -264,6 +265,8 @@ urlpatterns = [
     path('protocolo/update/<int:id>/', protocoloViews.update),
     path('protocolo/delete/<int:id>/', protocoloViews.delete),
     path('protocolo/list-all/', protocoloViews.list_all),
+    path('protocolo/relatorio/', protocoloViews.relatorio),
+    path('protocolo/export-csv/', protocoloViews.export_relatorio_csv),
 
     path('duplicata/find-byid/<int:id>/', duplicataViews.find_by_id),
     path('duplicata/create/', duplicataViews.create),
