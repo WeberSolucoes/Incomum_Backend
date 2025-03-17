@@ -71,3 +71,16 @@ def delete(request, id):
 @permission_classes([IsAuthenticated])
 def list_all(request):
     return parceiroService.list_all()
+
+
+@swagger_auto_schema(
+        methods=['get'],
+        responses={200: ParceiroSerializer(many=True)},
+        tags=['Loja'])
+@api_view(['GET'])
+
+@authentication_classes([JWTAuthentication])
+@permission_classes([AllowAny])
+@permission_classes([IsAuthenticated])
+def search(request):
+    return parceiroService.search(request)
