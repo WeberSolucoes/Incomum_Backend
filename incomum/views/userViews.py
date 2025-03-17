@@ -57,3 +57,16 @@ def PasswordRequest(request):
 def PasswordReset(request, uid, token):
     # Passa o request para o serviço de login
     return userService.PasswordReset(request, uid, token)
+
+
+@swagger_auto_schema(
+    methods=['get'],  # A requisição será via GET
+    request_body=UserSerializer,  # Validação do corpo da requisição com o serializer
+    responses={200: UserSerializer},  # A resposta segue o formato do serializer
+    tags=['Usuario']  # Tag para documentação no Swagger
+)
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])  # Permite apenas usuários autenticado
+def get_user_id(request):
+    # Passa o request para o serviço de login
+    return userService.get_user_id(request)
