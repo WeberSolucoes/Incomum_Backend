@@ -134,3 +134,13 @@ def PasswordReset(request, uid, token):
 
     return Response({'message': 'Senha redefinida com sucesso.'}, status=status.HTTP_200_OK)
 
+from django.http import JsonResponse
+from django.contrib.auth.decorators import login_required
+
+@login_required
+def get_user_id(request):
+    """
+    Retorna o ID do usuário autenticado.
+    """
+    user_id = request.user.id  # Pega o ID do usuário autenticado
+    return JsonResponse({'user_id': user_id})
