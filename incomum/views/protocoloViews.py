@@ -77,3 +77,29 @@ def delete(request, id):
 @permission_classes([IsAuthenticated])
 def list_all(request):
     return protocoloService.list_all()
+
+
+@swagger_auto_schema(
+        methods=['get'],
+        responses={200: ProtocoloSerializer(many=True)},
+        tags=['Loja'])
+@api_view(['GET'])
+
+@authentication_classes([JWTAuthentication])
+@permission_classes([AllowAny])
+@permission_classes([IsAuthenticated])
+def relatorio(request):
+    return protocoloService.relatorio(request)
+
+
+@swagger_auto_schema(
+        methods=['get'],
+        responses={200: ProtocoloSerializer(many=True)},
+        tags=['Loja'])
+@api_view(['GET'])
+
+@authentication_classes([JWTAuthentication])
+@permission_classes([AllowAny])
+@permission_classes([IsAuthenticated])
+def export_relatorio_csv(request):
+    return protocoloService.export_relatorio_csv(request)
