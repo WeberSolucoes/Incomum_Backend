@@ -5,7 +5,7 @@ from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from django.conf import settings
 from django.conf.urls.static import static
 
-from .views import duplicataViews,protocoloViews,fornecedorTipoViews, areaComercialViews, lojaViews, usuarioComercialViews, relatorioViews, relatorioViews,agenciaViews,vendedorViews,userViews,agenteViews,aeroportoViews,paisViews,cidadeViews,moedaViews,cepViews,departamentoViews,companhiaViews,assinaturaViews,classeViews,tipoAcomodacaoViews,tipoPadraoViews,tipoRegimeViews,situacaoTuristicoViews,servicoTuristicoViews,bandeiraViews,formaPagamentoViews,parceiroViews,parceiroContatoViews,bancoViews,despesasViews,centroCustoViews,subgrupoViews,despesasGeralViews 
+from .views import situacaoProtocoloViews,agenciaBancariaViews,duplicataViews,protocoloViews,fornecedorTipoViews, areaComercialViews, lojaViews, usuarioComercialViews, relatorioViews, relatorioViews,agenciaViews,vendedorViews,userViews,agenteViews,aeroportoViews,paisViews,cidadeViews,moedaViews,cepViews,departamentoViews,companhiaViews,assinaturaViews,classeViews,tipoAcomodacaoViews,tipoPadraoViews,tipoRegimeViews,situacaoTuristicoViews,servicoTuristicoViews,bandeiraViews,formaPagamentoViews,parceiroViews,parceiroContatoViews,bancoViews,despesasViews,centroCustoViews,subgrupoViews,despesasGeralViews 
 urlpatterns = [
 
     path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
@@ -274,6 +274,17 @@ urlpatterns = [
     path('duplicata/delete/<int:id>/', duplicataViews.delete),
     path('duplicata/list-all/', duplicataViews.list_all),
 
+    path('situacaoProtocolo/find-byid/<int:id>/', situacaoProtocoloViews.find_by_id),
+    path('situacaoProtocolo/create/', situacaoProtocoloViews.create),
+    path('situacaoProtocolo/update/<int:id>/', situacaoProtocoloViews.update),
+    path('situacaoProtocolo/delete/<int:id>/', situacaoProtocoloViews.delete),
+    path('situacaoProtocolo/list-all/', situacaoProtocoloViews.list_all),
+
+    path('agenciaBancaria/find-byid/<int:id>/', agenciaBancariaViews.find_by_id),
+    path('agenciaBancaria/create/', agenciaBancariaViews.create),
+    path('agenciaBancaria/update/<int:id>/', agenciaBancariaViews.update),
+    path('agenciaBancaria/delete/<int:id>/', agenciaBancariaViews.delete),
+    path('agenciaBancaria/list-all/', agenciaBancariaViews.list_all),
 
 
 
