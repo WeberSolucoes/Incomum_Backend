@@ -208,6 +208,7 @@ urlpatterns = [
     path('parceiro/update/<int:id>/', parceiroViews.update),
     path('parceiro/delete/<int:id>/', parceiroViews.delete),
     path('parceiro/list-all/', parceiroViews.list_all),
+    path('parceiro/search/', parceiroViews.search),
 
     #Parceiro
     path('parceirocontato/find-byid/<int:id>/', parceiroContatoViews.find_by_id),
